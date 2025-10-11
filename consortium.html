@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>컨소시엄 ROI & 손익분기점 시뮬레이터 (세액공제 포함)</title>
+  <link rel="icon" href="data:," />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--bg:#07111f;--card:#0f1c33;--muted:#8faad3;--accent:#19c3ff;--ok:#7ae582;--warn:#ffd166;--bad:#ef476f;--text:#eaf3ff}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Inter,Helvetica,Arial,sans-serif;background:linear-gradient(140deg,#0c1230,#0a1a44 40%,#06233a);color:var(--text)}
+    header{padding:20px 24px;border-bottom:1px solid #234a76;background:linear-gradient(90deg,rgba(25,195,255,.15),rgba(255,209,102,.08));backdrop-filter:blur(10px);position:sticky;top:0;z-index:10}
+    h1{margin:0;font-size:20px;letter-spacing:0.2px}
+    main{max-width:1200px;margin:24px auto;padding:0 16px 40px}
+    .grid{display:grid;grid-template-columns:1.1fr 1.5fr;gap:18px}
+    .card{background:var(--card);border:1px solid #1b3f68;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 12px;font-size:16px;color:#cfe6ff}
+    label{display:block;font-size:13px;margin:8px 0 4px;color:#cfe0ff}
+    input[type="text"],input[type="number"]{width:100%;border:1px solid #27507f;background:#0a1a33;color:var(--text);padding:10px 12px;border-radius:10px;outline:none;box-shadow:inset 0 0 0 999px rgba(255,255,255,.02)}
+    input[type="range"]{width:100%}
+    .row{display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:center}
+    .hint{font-size:12px;color:var(--muted)}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,#0e2a57,#143f7a);border:1px solid #2a67a6;color:#cfe6ff;font-size:12px;margin-right:6px}
+    .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid #2a3f63;background:linear-gradient(90deg,#0d2a4b,#163d6b);color:#eaf4ff;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:#47b8ff;box-shadow:0 0 0 3px rgba(71,184,255,.15)}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid #1f3d64}
+    th{text-align:left;color:#d6ecff}
+    tfoot td{font-weight:700}
+    .charts{display:grid;grid-template-columns:1fr;gap:16px}
+    .charts canvas{width:100% !important;height:300px !important;display:block}
+    @media (min-width:1100px){.charts{grid-template-columns:1fr 1fr}}
+    .kicker{display:flex;align-items:center;gap:12px;margin:8px 0 12px}
+    .kicker .dot{width:10px;height:10px;border-radius:999px;background:conic-gradient(from 0deg,#19c3ff,#7ae582,#ffd166,#ef476f,#19c3ff)}
+    .small{font-size:12px;color:#b8cff0}
+    .muted{color:#a9c0e6}
+    .foot{margin-top:10px;font-size:12px;color:#9db6da}
+    .test-pass{color:#7ae582;font-weight:700}
+    .test-fail{color:#ef476f;font-weight:700}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>컨소시엄 출자 ROI & 손익분기점 시뮬레이터 (세액공제 포함)</h1>
+  </header>
+  <main>
+    <section class="card" style="margin-bottom:18px;">
+      <h2>진단 (로딩 상태)</h2>
+      <div class="small">Chart.js: <span id="diagChart" class="muted">확인 중…</span> · 외부 401/404 로그는 플랫폼/확장에 의해 발생할 수 있으며 계산기 동작과 무관합니다.</div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>입력값</h2>
+        <div class="kicker"><span class="dot"></span><span class="small">필요에 맞게 수정하세요. 실시간으로 표/차트가 갱신됩니다.</span></div>
+
+        <label>출자금액 목록 (억 원, 콤마로 구분)</label>
+        <input id="investments" type="text" value="5,10,30" />
+        <div class="hint">예: <span class="pill">5</span><span class="pill">10</span><span class="pill">30</span> → 5억/10억/30억</div>
+
+        <label>배당 수익률 (연간, %)</label>
+        <div class="row">
+          <input id="dividendYield" type="range" min="1" max="12" step="0.1" value="5" />
+          <input id="dividendYieldNum" type="number" step="0.1" min="0" value="5" />
+        </div>
+
+        <label>연료구매 절감 효과 (총 연료비 대비, %)</label>
+        <div class="row">
+          <input id="fuelDiscount" type="range" min="0" max="10" step="0.1" value="3" />
+          <input id="fuelDiscountNum" type="number" step="0.1" min="0" value="3" />
+        </div>
+
+        <label>연간 연료비 (억원, LSFO 기준)</label>
+        <input id="annualFuelCost" type="number" step="0.1" value="204.93" />
+        <div class="hint">예: 22,000t × $690 × 1,350원/$ ≈ <b>2,049.3억 원</b> → 편의상 204.93로 입력 (억원)</div>
+
+        <div class="two-col" style="margin-top:8px;">
+          <label style="display:flex;gap:8px;align-items:center"><input id="includeFuelSaving" type="checkbox" checked /> 연료절감 포함</label>
+          <label style="display:flex;gap:8px;align-items:center"><input id="includePortSaving" type="checkbox" checked /> 항만감면 포함</label>
+        </div>
+
+        <label style="margin-top:8px">항만/AMP 감면 (억원/년)</label>
+        <input id="portSaving" type="number" step="0.1" value="2" />
+
+        <hr style="border:none;border-top:1px dashed #25507f;margin:14px 0">
+
+        <label>세액공제율 (조세특례제한법 §25, %)</label>
+        <div class="row">
+          <input id="taxCreditRate" type="range" min="0" max="10" step="0.1" value="3" />
+          <input id="taxCreditRateNum" type="number" step="0.1" min="0" value="3" />
+        </div>
+        <label style="display:flex;gap:8px;align-items:center;margin-top:6px;"><input id="includeTaxCredit" type="checkbox" checked /> 세액공제 포함</label>
+
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+          <button id="downloadCsv" class="btn">CSV 다운로드</button>
+          <button id="reset" class="btn">기본값 복원</button>
+        </div>
+        <div class="foot">※ 본 계산기는 개념 검토용입니다. 실제 계약/규격/환율/현물가/ETS/세제 적용 요건은 별도 반영해야 합니다.</div>
+      </section>
+
+      <section class="card">
+        <h2>결과 표</h2>
+        <table id="resultTable">
+          <thead>
+            <tr>
+              <th>출자금액(억)</th>
+              <th>배당 ROI(%)</th>
+              <th>연료절감 ROI(%)</th>
+              <th>항만감면 ROI(%)</th>
+              <th>세액공제 ROI(%)</th>
+              <th>총 ROI(%)</th>
+              <th>연 배당(억)</th>
+              <th>연 연료절감(억)</th>
+              <th>연 항만감면(억)</th>
+              <th>연 세액공제(억)</th>
+              <th>연 총혜택(억)</th>
+              <th>손익분기점(년)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>시각화</h2>
+      <div class="charts">
+        <canvas id="roiChart"></canvas>
+        <canvas id="paybackChart"></canvas>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>가정(편집 가능)</h2>
+      <p class="muted">• 연 배당 = 출자금액 × 배당 수익률<br/>• 연 연료절감 = 연간 연료비 × 절감율<br/>• 연 세액공제 = 출자금액 × 세액공제율 (단순 연환산 가정)<br/>• 연 총혜택 = 연 배당 + 연 연료절감 + 항만감면 + 연 세액공제<br/>• ROI(%) = 연 총혜택 ÷ 출자금액 × 100<br/>• 손익분기점(년) = 출자금액 ÷ 연 총혜택</p>
+      <p class="muted">※ 실제 세액공제는 1회성/공제한도/이월공제 등 세법 요건에 따르므로, 본 계산기의 세액공제는 “연환산된 효과”로 단순화한 가정입니다.</p>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>진단 / 테스트</h2>
+      <p class="muted">아래 버튼으로 기본값 기준 계산을 검증합니다. (허용 오차 ±0.05 ~ 0.2)</p>
+      <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+        <button id="runTests" class="btn">테스트 실행</button>
+        <span id="testSummary" class="small"></span>
+      </div>
+      <table id="testTable">
+        <thead>
+          <tr>
+            <th>시나리오</th>
+            <th>기대값</th>
+            <th>계산값</th>
+            <th>결과</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const fmt = new Intl.NumberFormat('ko-KR', {maximumFractionDigits: 2});
+
+    const els = {
+      investments: document.getElementById('investments'),
+      dividendYield: document.getElementById('dividendYield'),
+      dividendYieldNum: document.getElementById('dividendYieldNum'),
+      fuelDiscount: document.getElementById('fuelDiscount'),
+      fuelDiscountNum: document.getElementById('fuelDiscountNum'),
+      annualFuelCost: document.getElementById('annualFuelCost'),
+      portSaving: document.getElementById('portSaving'),
+      taxCreditRate: document.getElementById('taxCreditRate'),
+      taxCreditRateNum: document.getElementById('taxCreditRateNum'),
+      tableBody: document.querySelector('#resultTable tbody'),
+      dlCsv: document.getElementById('downloadCsv'),
+      reset: document.getElementById('reset'),
+      runTests: document.getElementById('runTests'),
+      testTableBody: document.querySelector('#testTable tbody'),
+      testSummary: document.getElementById('testSummary')
+    };
+
+    // checkbox refs
+    const cbFuel = () => document.getElementById('includeFuelSaving').checked;
+    const cbPort = () => document.getElementById('includePortSaving').checked;
+    const cbTax  = () => document.getElementById('includeTaxCredit').checked;
+
+    // range & number sync
+    function syncPair(rangeEl, numberEl){
+      rangeEl.addEventListener('input', ()=> numberEl.value = rangeEl.value);
+      numberEl.addEventListener('input', ()=> rangeEl.value = numberEl.value);
+    }
+    syncPair(els.dividendYield, els.dividendYieldNum);
+    syncPair(els.fuelDiscount, els.fuelDiscountNum);
+    syncPair(els.taxCreditRate, els.taxCreditRateNum);
+
+    // charts
+    let roiChart, paybackChart;
+
+    function parseInvestments(){
+      return els.investments.value
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(v => Number(v))
+        .filter(v => !isNaN(v) && v > 0);
+    }
+
+    function calc(){
+      const invs = parseInvestments();
+      const divY = Math.max(0, Number(els.dividendYield.value)) / 100;
+      const disc = Math.max(0, Number(els.fuelDiscount.value)) / 100;
+      const annualFuel = Math.max(0, Number(els.annualFuelCost.value)) || 0; // 억원
+      const portSaveVal = Math.max(0, Number(els.portSaving.value)) || 0; // 억원
+      const taxRate = Math.max(0, Number(els.taxCreditRate.value)) / 100;
+
+      return invs.map(inv => {
+        const invPos = Math.max(1e-6, Number(inv));
+        const divAmt = invPos * divY; // 억원
+        const fuelAmt = cbFuel() ? annualFuel * disc : 0; // 억원
+        const portAmt = cbPort() ? portSaveVal : 0; // 억원
+        const taxAmt  = cbTax()  ? invPos * taxRate   : 0; // 억원 (연환산 가정)
+
+        const total = divAmt + fuelAmt + portAmt + taxAmt; // 억원
+        const roiDiv = (divAmt / invPos) * 100;
+        const roiFuel = (fuelAmt / invPos) * 100;
+        const roiPort = (portAmt / invPos) * 100;
+        const roiTax  = (taxAmt  / invPos) * 100;
+        const roi = roiDiv + roiFuel + roiPort + roiTax;
+        const payback = total > 0 ? invPos / total : null;
+        return {inv:invPos, divAmt, fuelAmt, portAmt, taxAmt, total, roiDiv, roiFuel, roiPort, roiTax, roi, payback};
+      });
+    }
+
+    function renderTable(rows){
+      els.tableBody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${fmt.format(r.inv)}</td>
+          <td>${fmt.format(r.roiDiv)}</td>
+          <td>${fmt.format(r.roiFuel)}</td>
+          <td>${fmt.format(r.roiPort)}</td>
+          <td>${fmt.format(r.roiTax)}</td>
+          <td>${fmt.format(r.roi)}</td>
+          <td>${fmt.format(r.divAmt)}</td>
+          <td>${fmt.format(r.fuelAmt)}</td>
+          <td>${fmt.format(r.portAmt)}</td>
+          <td>${fmt.format(r.taxAmt)}</td>
+          <td>${fmt.format(r.total)}</td>
+          <td>${r.payback? fmt.format(r.payback) : '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function buildCommonOpts(){
+      return {
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{labels:{color:'#d6ecff'}},
+          tooltip:{mode:'index', intersect:false},
+          title:{display:false}
+        },
+        scales:{
+          x:{ticks:{color:'#d6ecff'}},
+          y:{ticks:{color:'#d6ecff'}, grid:{color:'rgba(255,255,255,0.1)'}}
+        }
+      };
+    }
+
+    function renderCharts(rows){
+      if(!rows || rows.length === 0){
+        if(roiChart){ roiChart.destroy(); roiChart = null; }
+        if(paybackChart){ paybackChart.destroy(); paybackChart = null; }
+        return;
+      }
+
+      const labels = rows.map(r => r.inv + '억');
+      const roiBarDiv = rows.map(r => r.roiDiv);
+      const roiBarFuel = rows.map(r => r.roiFuel);
+      const roiBarPort = rows.map(r => r.roiPort);
+      const roiBarTax  = rows.map(r => r.roiTax);
+      const roiLineTotal = rows.map(r => r.roi);
+      const paybackData = rows.map(r => r.payback || 0);
+
+      const commonOpts = buildCommonOpts();
+
+      // ROI (stacked bars + line)
+      if(roiChart){ roiChart.destroy(); }
+      const roiCanvas = document.getElementById('roiChart');
+      const roiCtx = roiCanvas && roiCanvas.getContext('2d');
+      if(roiCtx){
+        roiChart = new Chart(roiCtx,{
+          type:'bar',
+          data:{labels, datasets:[
+            {type:'bar', label:'배당 ROI', data:roiBarDiv, backgroundColor:'rgba(25,195,255,0.35)', borderColor:'#19c3ff', borderWidth:1, borderRadius:8, stack:'roi'},
+            {type:'bar', label:'연료절감 ROI', data:roiBarFuel, backgroundColor:'rgba(122,229,130,0.40)', borderColor:'#7ae582', borderWidth:1, borderRadius:8, stack:'roi'},
+            {type:'bar', label:'항만감면 ROI', data:roiBarPort, backgroundColor:'rgba(255,209,102,0.40)', borderColor:'#ffd166', borderWidth:1, borderRadius:8, stack:'roi'},
+            {type:'bar', label:'세액공제 ROI', data:roiBarTax, backgroundColor:'rgba(231,238,252,0.45)', borderColor:'#e7eefc', borderWidth:1, borderRadius:8, stack:'roi'},
+            {type:'line', label:'총 ROI (라인)', data:roiLineTotal, borderColor:'#ef476f', pointBackgroundColor:'#ef476f', pointRadius:3, tension:0.25, yAxisID:'y'}
+          ]},
+          options:{
+            ...commonOpts,
+            plugins:{...commonOpts.plugins, title:{display:true, text:'ROI — 구성요소 스택 + 총합 라인', color:'#e7eefc'}},
+            scales:{
+              x:{...commonOpts.scales.x, stacked:true},
+              y:{...commonOpts.scales.y, stacked:false, title:{display:true, text:'%'}}
+            }
+          }
+        });
+      }
+
+      // Payback (bar + line)
+      if(paybackChart){ paybackChart.destroy(); }
+      const pbCanvas = document.getElementById('paybackChart');
+      const pbCtx = pbCanvas && pbCanvas.getContext('2d');
+      if(pbCtx){
+        paybackChart = new Chart(pbCtx,{
+          type:'bar',
+          data:{labels, datasets:[
+            {type:'bar', label:'손익분기점(년)', data:paybackData, backgroundColor:'rgba(122,229,130,0.30)', borderColor:'#7ae582', borderWidth:1, borderRadius:8},
+            {type:'line', label:'손익분기점(라인)', data:paybackData, borderColor:'#19c3ff', pointBackgroundColor:'#19c3ff', pointRadius:3, tension:0.25, yAxisID:'y'}
+          ]},
+          options:{
+            ...commonOpts,
+            plugins:{...commonOpts.plugins, title:{display:true, text:'손익분기점 — 막대 + 선형', color:'#e7eefc'}},
+            scales:{
+              x:{...commonOpts.scales.x},
+              y:{...commonOpts.scales.y, title:{display:true, text:'년'}}
+            }
+          }
+        });
+      }
+    }
+
+    function update(){
+      try{
+        const rows = calc();
+        renderTable(rows);
+        renderCharts(rows);
+      }catch(err){
+        console.error(err);
+        alert('오류가 발생했습니다: ' + err.message);
+      }
+    }
+
+    function downloadCsv(){
+      const rows = calc();
+      const header = ['출자금액(억)','배당 ROI(%)','연료절감 ROI(%)','항만감면 ROI(%)','세액공제 ROI(%)','총 ROI(%)','연 배당(억)','연 연료절감(억)','연 항만감면(억)','연 세액공제(억)','연 총혜택(억)','손익분기점(년)'];
+      const lines = [header.join(',')].concat(rows.map(r => [r.inv, r.roiDiv, r.roiFuel, r.roiPort, r.roiTax, r.roi, r.divAmt, r.fuelAmt, r.portAmt, r.taxAmt, r.total, (r.payback!==null?r.payback:'')].join(',')));
+      const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'consortium_roi_payback_with_tax.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function reset(){
+      els.investments.value = '5,10,30';
+      els.dividendYield.value = 5; els.dividendYieldNum.value = 5;
+      els.fuelDiscount.value = 3; els.fuelDiscountNum.value = 3;
+      els.annualFuelCost.value = 204.93;
+      els.portSaving.value = 2;
+      els.taxCreditRate.value = 3; els.taxCreditRateNum.value = 3;
+      document.getElementById('includeFuelSaving').checked = true;
+      document.getElementById('includePortSaving').checked = true;
+      document.getElementById('includeTaxCredit').checked = true;
+      update();
+    }
+
+    function approx(a,b,tol=0.05){ return Math.abs(a-b) <= tol; }
+    function runTests(){
+      // --- keep current UI state (NO reset, NO mutation) ---
+      const snapshot = {
+        investments: els.investments.value,
+        dividendYield: els.dividendYield.value,
+        fuelDiscount: els.fuelDiscount.value,
+        annualFuelCost: els.annualFuelCost.value,
+        portSaving: els.portSaving.value,
+        taxCreditRate: els.taxCreditRate.value,
+        includeFuel: cbFuel(),
+        includePort: cbPort(),
+        includeTax: cbTax()
+      };
+
+      // Pure calculator (no DOM writes)
+      function calcWith(params){
+        const { investments, dividendYield, fuelDiscount, annualFuelCost, portSaving, taxCreditRate, includeFuel, includePort, includeTax } = params;
+        const invs = investments.split(',').map(s=>Number(s.trim())).filter(v=>!isNaN(v) && v>0);
+        const divY = Math.max(0, Number(dividendYield))/100;
+        const disc = Math.max(0, Number(fuelDiscount))/100;
+        const annualFuel = Math.max(0, Number(annualFuelCost)) || 0;
+        const port = Math.max(0, Number(portSaving)) || 0;
+        const taxR = Math.max(0, Number(taxCreditRate))/100;
+        return invs.map(inv=>{
+          const invPos = Math.max(1e-6, inv);
+          const divAmt = invPos*divY;
+          const fuelAmt = includeFuel ? annualFuel*disc : 0;
+          const portAmt = includePort ? port : 0;
+          const taxAmt  = includeTax  ? invPos*taxR : 0;
+          const total = divAmt + fuelAmt + portAmt + taxAmt;
+          const roi = (total/invPos)*100;
+          const payback = total>0 ? invPos/total : null;
+          return {inv:invPos, roi, payback};
+        });
+      }
+
+      els.testTableBody.innerHTML = '';
+      let allPass = true;
+
+      // ---- Test scenarios (do not touch UI) ----
+      // A) 기본값(All ON: 연료/항만/세액 ON)
+      const rowsA = calcWith({
+        investments: '5,10,30',
+        dividendYield: 5,
+        fuelDiscount: 3,
+        annualFuelCost: 204.93,
+        portSaving: 2,
+        taxCreditRate: 3,
+        includeFuel: true,
+        includePort: true,
+        includeTax: true
+      });
+      const expectedAllOn = [
+        {inv:5, roi:170.958, payback:0.585},
+        {inv:10, roi:89.479, payback:1.118},
+        {inv:30, roi:35.1597, payback:2.844}
+      ];
+      rowsA.forEach((r,i)=>{
+        const e = expectedAllOn[i];
+        const passRoi = approx(r.roi, e.roi, 0.2);
+        const passPb = approx(r.payback, e.payback, 0.01);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>기본값 ${r.inv}억</td><td>ROI ${e.roi.toFixed(3)}%, PB ${e.payback.toFixed(3)}년</td><td>ROI ${r.roi.toFixed(3)}%, PB ${r.payback?r.payback.toFixed(3):'-'}년</td><td class="${(passRoi&&passPb)?'test-pass':'test-fail'}">${(passRoi&&passPb)?'PASS':'FAIL'}</td>`;
+        els.testTableBody.appendChild(tr);
+        if(!(passRoi&&passPb)) allPass = false;
+      });
+
+      // B) 배당만(연료/항만/세액 OFF)
+      const rowsB = calcWith({
+        investments: '5,10,30',
+        dividendYield: 5,
+        fuelDiscount: 3,
+        annualFuelCost: 204.93,
+        portSaving: 2,
+        taxCreditRate: 3,
+        includeFuel: false,
+        includePort: false,
+        includeTax: false
+      });
+      const expectedDivOnly = [
+        {inv:5, roi:5.00, payback:20.00},
+        {inv:10, roi:5.00, payback:20.00},
+        {inv:30, roi:5.00, payback:20.00}
+      ];
+      rowsB.forEach((r,i)=>{
+        const e = expectedDivOnly[i];
+        const passRoi = approx(r.roi, e.roi, 0.05);
+        const passPb = approx(r.payback, e.payback, 0.05);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>배당만 ${r.inv}억</td><td>ROI ${e.roi.toFixed(2)}%, PB ${e.payback.toFixed(2)}년</td><td>ROI ${r.roi.toFixed(2)}%, PB ${r.payback?r.payback.toFixed(2):'-'}년</td><td class="${(passRoi&&passPb)?'test-pass':'test-fail'}">${(passRoi&&passPb)?'PASS':'FAIL'}</td>`;
+        els.testTableBody.appendChild(tr);
+        if(!(passRoi&&passPb)) allPass = false;
+      });
+
+      // C) 연료만 ON (항만/세액 OFF)
+      const rowsC = calcWith({
+        investments: '5,10,30',
+        dividendYield: 5,
+        fuelDiscount: 3,
+        annualFuelCost: 204.93,
+        portSaving: 2,
+        taxCreditRate: 3,
+        includeFuel: true,
+        includePort: false,
+        includeTax: false
+      });
+      const expectedFuelOnly = [
+        {inv:5, roi:127.958, payback:0.7815},
+        {inv:10, roi:66.479, payback:1.5042},
+        {inv:30, roi:25.493, payback:3.9226}
+      ];
+      rowsC.forEach((r,i)=>{
+        const e = expectedFuelOnly[i];
+        const passRoi = approx(r.roi, e.roi, 0.2);
+        const passPb = approx(r.payback, e.payback, 0.01);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>연료만 ${r.inv}억</td><td>ROI ${e.roi.toFixed(3)}%, PB ${e.payback.toFixed(4)}년</td><td>ROI ${r.roi.toFixed(3)}%, PB ${r.payback?r.payback.toFixed(4):'-'}년</td><td class="${(passRoi&&passPb)?'test-pass':'test-fail'}">${(passRoi&&passPb)?'PASS':'FAIL'}</td>`;
+        els.testTableBody.appendChild(tr);
+        if(!(passRoi&&passPb)) allPass = false;
+      });
+
+      // D) 항만만 ON (연료/세액 OFF)
+      const rowsD = calcWith({
+        investments: '5,10,30',
+        dividendYield: 5,
+        fuelDiscount: 3,
+        annualFuelCost: 204.93,
+        portSaving: 2,
+        taxCreditRate: 3,
+        includeFuel: false,
+        includePort: true,
+        includeTax: false
+      });
+      const expectedPortOnly = [
+        {inv:5, roi:45.00, payback:2.2222},
+        {inv:10, roi:25.00, payback:4.0000},
+        {inv:30, roi:11.6667, payback:8.5714}
+      ];
+      rowsD.forEach((r,i)=>{
+        const e = expectedPortOnly[i];
+        const passRoi = approx(r.roi, e.roi, 0.1);
+        const passPb = approx(r.payback, e.payback, 0.01);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>항만만 ${r.inv}억</td><td>ROI ${e.roi.toFixed(2)}%, PB ${e.payback.toFixed(4)}년</td><td>ROI ${r.roi.toFixed(2)}%, PB ${r.payback?r.payback.toFixed(4):'-'}년</td><td class="${(passRoi&&passPb)?'test-pass':'test-fail'}">${(passRoi&&passPb)?'PASS':'FAIL'}</td>`;
+        els.testTableBody.appendChild(tr);
+        if(!(passRoi&&passPb)) allPass = false;
+      });
+
+      // E) 세액만 ON (연료/항만 OFF)
+      const rowsE = calcWith({
+        investments: '5,10,30',
+        dividendYield: 5,
+        fuelDiscount: 3,
+        annualFuelCost: 204.93,
+        portSaving: 2,
+        taxCreditRate: 3,
+        includeFuel: false,
+        includePort: false,
+        includeTax: true
+      });
+      const expectedTaxOnly = [
+        {inv:5, roi:8.00, payback:12.5},
+        {inv:10, roi:8.00, payback:12.5},
+        {inv:30, roi:8.00, payback:12.5}
+      ];
+      rowsE.forEach((r,i)=>{
+        const e = expectedTaxOnly[i];
+        const passRoi = approx(r.roi, e.roi, 0.05);
+        const passPb = approx(r.payback, e.payback, 0.05);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>세액만 ${r.inv}억</td><td>ROI ${e.roi.toFixed(2)}%, PB ${e.payback.toFixed(2)}년</td><td>ROI ${r.roi.toFixed(2)}%, PB ${r.payback?r.payback.toFixed(2):'-'}년</td><td class="${(passRoi&&passPb)?'test-pass':'test-fail'}">${(passRoi&&passPb)?'PASS':'FAIL'}</td>`;
+        els.testTableBody.appendChild(tr);
+        if(!(passRoi&&passPb)) allPass = false;
+      });
+
+      els.testSummary.textContent = allPass ? '모든 테스트 통과 (입력값 유지됨)' : '일부 테스트 실패 (입력값/가정 확인 필요, 입력값은 변경되지 않았습니다)';
+
+      // finally: re-render current UI state (but do not mutate values)
+      const currentRows = calc();
+      renderTable(currentRows);
+      renderCharts(currentRows);
+    }
+
+    // events
+    ['input','change'].forEach(ev => {
+      document.querySelectorAll('input').forEach(el => el.addEventListener(ev, update));
+    });
+    els.dlCsv.addEventListener('click', downloadCsv);
+    els.reset.addEventListener('click', reset);
+    els.runTests.addEventListener('click', runTests);
+
+    // init after full load
+    window.addEventListener('load', ()=>{
+      if(typeof Chart !== 'undefined'){
+        Chart.defaults.maintainAspectRatio = false;
+      }
+      const diag = document.getElementById('diagChart');
+      if(diag){ diag.textContent = (typeof Chart !== 'undefined') ? '로드됨 ✅' : '미로드 ⚠️'; }
+      update();
+    });
+  </script>
+</body>
+</html>
