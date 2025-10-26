@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,72 +8,356 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root { --bg:#0b1220; --card:#121a2a; --muted:#9fb0d1; --text:#e8eefc; }
-    *{box-sizing:border-box}
-    body {font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif; margin:0; background:linear-gradient(180deg,#0a0f1c,#0d1526); color:var(--text)}
-    header {position:sticky; top:0; z-index:5; backdrop-filter: blur(8px); background:rgba(10,15,28,.6); border-bottom:1px solid rgba(255,255,255,.06)}
-    header .wrap {display:flex; align-items:center; gap:16px; max-width:1200px; margin:0 auto; padding:16px}
-    h1 {font-size:22px; margin:0 8px 0 0}
-    .container {max-width:1280px; margin:20px auto 80px; padding:0 16px}
-    .grid {display:grid; grid-template-columns:1fr 1fr; gap:16px}
-    @media(max-width: 1100px){.grid{grid-template-columns:1fr}}
-    .card {background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:18px; box-shadow: 0 8px 24px rgba(0,0,0,.35)}
-    .card h2 {margin:0 0 12px; font-size:18px}
-    .subtle {color:var(--muted); font-size:13px}
-    table {width:100%; border-collapse: collapse; margin-top:10px; table-layout: fixed}
-    th, td {border-bottom:1px solid rgba(255,255,255,.06); padding:8px; text-align:left; vertical-align: middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-    thead th {font-size:12px; color:var(--muted); text-transform: uppercase; letter-spacing:.08em}
-    input, select {width:100%; background:#0e1627; color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:8px 10px; outline:none}
-    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .row-actions {display:flex; gap:8px; justify-content:center}
-    .btn {cursor:pointer; border:1px solid rgba(255,255,255,.12); background:#0e1627; color:var(--text); padding:6px 10px; border-radius:10px; font-size:12px; white-space:nowrap}
-    .btn:hover {background:#111b30}
-    .btn.ghost {background:transparent; border-color:rgba(255,255,255,.2)}
-    .chip {background:#0e1627; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; font-size:12px}
-    .kpi {display:grid; grid-template-columns: repeat(3,1fr); gap:8px}
-    .kpi .chip strong {display:block; font-size:14px}
-    .right {text-align:right}
-    .small {font-size:12px; color:var(--muted)}
-    .mt8{margin-top:8px} .mt12{margin-top:12px} .mt16{margin-top:16px}
-    .scroll {max-height:320px; overflow:auto; border:1px solid rgba(255,255,255,.06); border-radius:12px}
-    .pill {font-size:11px; color:#cfe1ff; background:#0f1d3a; border:1px solid rgba(255,255,255,.08); padding:2px 8px; border-radius:999px}
-    .preset {font-size:11px; color:#b9c8e8}
-    /* Wider column widths for readability */
-    #tblBase th:nth-child(1), #tblBase td:nth-child(1) {width:170px}
-    #tblBase th:nth-child(2), #tblBase td:nth-child(2) {width:120px}
-    #tblBase th:nth-child(3), #tblBase td:nth-child(3) {width:140px}
-    #tblBase th:nth-child(4), #tblBase td:nth-child(4) {width:240px}
-    #tblBase th:nth-child(5), #tblBase td:nth-child(5) {width:150px}
-    #tblBase th:nth-child(6), #tblBase td:nth-child(6) {width:150px}
-    #tblBase th:nth-child(7), #tblBase td:nth-child(7) {width:120px}
-    #tblBase th:nth-child(8), #tblBase td:nth-child(8) {width:120px}
-    #tblBase th:nth-child(9), #tblBase td:nth-child(9) {width:90px}
+    :root {
+      --bg: #0b1220;
+      --card: #121a2a;
+      --muted: #9fb0d1;
+      --text: #e8eefc;
+    }
 
-    #tblFuel th:nth-child(1), #tblFuel td:nth-child(1) {width:190px}
-    #tblFuel th:nth-child(2), #tblFuel td:nth-child(2) {width:120px}
-    #tblFuel th:nth-child(3), #tblFuel td:nth-child(3) {width:130px}
-    #tblFuel th:nth-child(4), #tblFuel td:nth-child(4) {width:220px}
-    #tblFuel th:nth-child(5), #tblFuel td:nth-child(5) {width:140px}
-    #tblFuel th:nth-child(6), #tblFuel td:nth-child(6) {width:140px}
-    #tblFuel th:nth-child(7), #tblFuel td:nth-child(7) {width:120px}
-    #tblFuel th:nth-child(8), #tblFuel td:nth-child(8) {width:110px}
-    #tblFuel th:nth-child(9), #tblFuel td:nth-child(9) {width:80px}
-    #tblFuel th:nth-child(10), #tblFuel td:nth-child(10) {width:70px}
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(180deg, #0a0f1c, #0d1526);
+      color: var(--text)
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(8px);
+      background: rgba(10, 15, 28, .6);
+      border-bottom: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    header .wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 8px 0 0
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 20px auto 80px;
+      padding: 0 16px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    @media(max-width: 1100px) {
+      .grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .35)
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      table-layout: fixed
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      padding: 8px;
+      text-align: left;
+      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    thead th {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: #0e1627;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      padding: 8px 10px;
+      outline: none
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center
+    }
+
+    .btn {
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: #0e1627;
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      white-space: nowrap
+    }
+
+    .btn:hover {
+      background: #111b30
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: rgba(255, 255, 255, .2)
+    }
+
+    .chip {
+      background: #0e1627;
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px
+    }
+
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .kpi .chip strong {
+      display: block;
+      font-size: 14px
+    }
+
+    .right {
+      text-align: right
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .mt8 {
+      margin-top: 8px
+    }
+
+    .mt12 {
+      margin-top: 12px
+    }
+
+    .mt16 {
+      margin-top: 16px
+    }
+
+    .scroll {
+      max-height: 320px;
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, .06);
+      border-radius: 12px
+    }
+
+    .pill {
+      font-size: 11px;
+      color: #cfe1ff;
+      background: #0f1d3a;
+      border: 1px solid rgba(255, 255, 255, .08);
+      padding: 2px 8px;
+      border-radius: 999px
+    }
+
+    .preset {
+      font-size: 11px;
+      color: #b9c8e8
+    }
+
+    /* Wider column widths for readability */
+    #tblBase th:nth-child(1),
+    #tblBase td:nth-child(1) {
+      width: 170px
+    }
+
+    #tblBase th:nth-child(2),
+    #tblBase td:nth-child(2) {
+      width: 120px
+    }
+
+    #tblBase th:nth-child(3),
+    #tblBase td:nth-child(3) {
+      width: 140px
+    }
+
+    #tblBase th:nth-child(4),
+    #tblBase td:nth-child(4) {
+      width: 240px
+    }
+
+    #tblBase th:nth-child(5),
+    #tblBase td:nth-child(5) {
+      width: 150px
+    }
+
+    #tblBase th:nth-child(6),
+    #tblBase td:nth-child(6) {
+      width: 150px
+    }
+
+    #tblBase th:nth-child(7),
+    #tblBase td:nth-child(7) {
+      width: 120px
+    }
+
+    #tblBase th:nth-child(8),
+    #tblBase td:nth-child(8) {
+      width: 120px
+    }
+
+    #tblBase th:nth-child(9),
+    #tblBase td:nth-child(9) {
+      width: 90px
+    }
+
+    #tblFuel th:nth-child(1),
+    #tblFuel td:nth-child(1) {
+      width: 190px
+    }
+
+    #tblFuel th:nth-child(2),
+    #tblFuel td:nth-child(2) {
+      width: 120px
+    }
+
+    #tblFuel th:nth-child(3),
+    #tblFuel td:nth-child(3) {
+      width: 130px
+    }
+
+    #tblFuel th:nth-child(4),
+    #tblFuel td:nth-child(4) {
+      width: 220px
+    }
+
+    #tblFuel th:nth-child(5),
+    #tblFuel td:nth-child(5) {
+      width: 140px
+    }
+
+    #tblFuel th:nth-child(6),
+    #tblFuel td:nth-child(6) {
+      width: 140px
+    }
+
+    #tblFuel th:nth-child(7),
+    #tblFuel td:nth-child(7) {
+      width: 120px
+    }
+
+    #tblFuel th:nth-child(8),
+    #tblFuel td:nth-child(8) {
+      width: 110px
+    }
+
+    #tblFuel th:nth-child(9),
+    #tblFuel td:nth-child(9) {
+      width: 80px
+    }
+
+    #tblFuel th:nth-child(10),
+    #tblFuel td:nth-child(10) {
+      width: 70px
+    }
 
     /* test panel */
-    #testPanel {background:#0e1627; border:1px dashed rgba(255,255,255,.2); border-radius:12px; padding:12px; margin-top:16px}
-    #testPanel pre {max-height:200px; overflow:auto; margin:0}
+    #testPanel {
+      background: #0e1627;
+      border: 1px dashed rgba(255, 255, 255, .2);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 16px
+    }
+
+    #testPanel pre {
+      max-height: 200px;
+      overflow: auto;
+      margin: 0
+    }
 
     /* market table */
-    #tblMarket th:nth-child(1){width:170px}
-    #tblMarket th:nth-child(2), #tblMarket td:nth-child(2){width:130px}
-    #tblMarket th:nth-child(3), #tblMarket td:nth-child(3){width:140px}
-    #tblMarket th:nth-child(4), #tblMarket td:nth-child(4){width:280px}
-    #tblMarket th:nth-child(5), #tblMarket td:nth-child(5){width:120px}
-  
-    .hidden{ visibility:hidden; position:absolute; left:-9999px; }
+    #tblMarket th:nth-child(1) {
+      width: 170px
+    }
+
+    #tblMarket th:nth-child(2),
+    #tblMarket td:nth-child(2) {
+      width: 130px
+    }
+
+    #tblMarket th:nth-child(3),
+    #tblMarket td:nth-child(3) {
+      width: 140px
+    }
+
+    #tblMarket th:nth-child(4),
+    #tblMarket td:nth-child(4) {
+      width: 280px
+    }
+
+    #tblMarket th:nth-child(5),
+    #tblMarket td:nth-child(5) {
+      width: 120px
+    }
+
+    .hidden {
+      visibility: hidden;
+      position: absolute;
+      left: -9999px;
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div class="wrap">
@@ -93,7 +378,8 @@
         <div class="small">아래 수치는 오늘 기준 외부 출처를 참고해 **스냅샷**으로 넣었습니다. 환율(USD→KRW)은 편집 가능하며, USD 단가도 수정 가능합니다.</div>
         <div class="row-actions mt8" style="gap:12px; align-items:center">
           <button class="btn" id="btnMarketAdd">+ 시세 행 추가</button>
-          <div class="chip">환율(1 USD → KRW): <input id="fxUSDKRW" type="number" step="1" min="500" value="1404" style="width:120px; margin-left:6px"/></div>
+          <div class="chip">환율(1 USD → KRW): <input id="fxUSDKRW" type="number" step="1" min="500" value="1404"
+              style="width:120px; margin-left:6px" /></div>
           <div class="chip">단위: $/mt 기준 (※ LNG는 11.05 $/MMBtu → **52 MMBtu/mt 가정**)</div>
           <div class="chip">기준일: <span id="marketAsOf">2025-10-02</span></div>
         </div>
@@ -124,7 +410,10 @@
         <div class="scroll mt8">
           <table id="tblEnergy">
             <thead>
-              <tr><th>유종</th><th>에너지 효율 (MMBtu/mt)</th></tr>
+              <tr>
+                <th>유종</th>
+                <th>에너지 효율 (MMBtu/mt)</th>
+              </tr>
             </thead>
             <tbody id="energyBody"></tbody>
           </table>
@@ -133,55 +422,55 @@
     </div>
 
     <section class="card">
-        <h2>기준 연료(합계 반영)</h2>
-        <div class="small">여기에 추가된 모든 <strong>기준 연료 행의 합계</strong>가 비교의 기준이 됩니다. (추가/삭제/리스트 관리 대안과 동일)</div>
-        <div class="row-actions mt8">
-          <button class="btn" id="btnAddBaseVLSFO">+ 기준 VLSFO (저유황유)</button>
-          <button class="btn" id="btnAddBaseMGO">+ 기준 MGO (경유)</button>
-          <button class="btn ghost" id="btnAddBaseCustom">+ 기준 사용자 지정</button>
-        </div>
-        <div class="scroll mt8">
-          <table id="tblBase">
-            <thead>
-              <tr>
-                <th>유종</th>
-                <th>연간 사용량 (톤)</th>
-                <th>모드</th>
-                <th>단가(₩/톤) 또는 연간비용 평균(₩)</th>
-                <th>배출계수 (tCO₂/톤)</th>
-                <th>탄소단가 (₩/tCO₂e)</th>
-                <th>메탄 슬립 (%)</th>
-                <th>GWP100(CH₄)</th>
-                <th>리스트</th>
-                <th>삭제</th>
-              </tr>
-            </thead>
-            <tbody id="baselineBody"></tbody>
-          </table>
-        </div>
-        <div class="kpi mt12">
-          <div class="chip"><strong>기준(합계) 연료비</strong><span id="kpiBaseFuel">-</span></div>
-          <div class="chip"><strong>기준(합계) 탄소비용</strong><span id="kpiBaseCarbon">-</span></div>
-          <div class="chip"><strong>기준(합계) 총비용</strong><span id="kpiBaseTotal">-</span></div>
-        </div>
-        <div class="small mt8" style="color:#b9c8e8;">
-          <strong>기준(합계) 탄소비용 산출 공식:</strong><br>
-          모든 기준연료 행에 대해<br>
-          <span style="font-family:monospace;">(연간 사용량 × 배출계수 + 연간 사용량 × (메탄슬립%/100) × GWP) × 탄소단가</span>를 합산<br>
-          <span style="font-family:monospace;">= Σ [ (vol × ef + vol × (slip/100) × gwp) × cprice ]</span><br>
-          <span style="font-size:11px;">vol: 연간 사용량(톤), ef: 배출계수(tCO₂/톤), slip: 메탄슬립(%), gwp: GWP100(CH₄), cprice: 탄소단가(₩/tCO₂e)</span>
-        </div>
-      </section>
+      <h2>기준 연료(합계 반영)</h2>
+      <div class="small">여기에 추가된 모든 <strong>기준 연료 행의 합계</strong>가 비교의 기준이 됩니다. (추가/삭제/리스트 관리 대안과 동일)</div>
+      <div class="row-actions mt8">
+        <button class="btn" id="btnAddBaseVLSFO">+ 기준 VLSFO (저유황유)</button>
+        <button class="btn" id="btnAddBaseMGO">+ 기준 MGO (경유)</button>
+        <button class="btn ghost" id="btnAddBaseCustom">+ 기준 사용자 지정</button>
+      </div>
+      <div class="scroll mt8">
+        <table id="tblBase">
+          <thead>
+            <tr>
+              <th>유종</th>
+              <th>연간 사용량 (톤)</th>
+              <th>모드</th>
+              <th>단가(₩/톤) 또는 연간비용 평균(₩)</th>
+              <th>배출계수 (tCO₂/톤)</th>
+              <th>탄소단가 (₩/tCO₂e)</th>
+              <th>메탄 슬립 (%)</th>
+              <th>GWP100(CH₄)</th>
+              <th>리스트</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody id="baselineBody"></tbody>
+        </table>
+      </div>
+      <div class="kpi mt12">
+        <div class="chip"><strong>기준(합계) 연료비</strong><span id="kpiBaseFuel">-</span></div>
+        <div class="chip"><strong>기준(합계) 탄소비용</strong><span id="kpiBaseCarbon">-</span></div>
+        <div class="chip"><strong>기준(합계) 총비용</strong><span id="kpiBaseTotal">-</span></div>
+      </div>
+      <div class="small mt8" style="color:#b9c8e8;">
+        <strong>기준(합계) 탄소비용 산출 공식:</strong><br>
+        모든 기준연료 행에 대해<br>
+        <span style="font-family:monospace;">(연간 사용량 × 배출계수 + 연간 사용량 × (메탄슬립%/100) × GWP) × 탄소단가</span>를 합산<br>
+        <span style="font-family:monospace;">= Σ [ (vol × ef + vol × (slip/100) × gwp) × cprice ]</span><br>
+        <span style="font-size:11px;">vol: 연간 사용량(톤), ef: 배출계수(tCO₂/톤), slip: 메탄슬립(%), gwp: GWP100(CH₄), cprice:
+          탄소단가(₩/tCO₂e)</span>
+      </div>
+    </section>
 
-      <section class="card">
-        <h2>차트</h2>
-        <div class="card" style="background:#0e1627" style="background:#0e1627; min-height:320px; padding:16px"><h3 style="margin:0 0 8px">총비용 구성 (기준 각 행 + 합계 + 대안)</h3><canvas id="barStack" height="150"></canvas></div>
-        <div class="card mt12" style="background:#0e1627" style="background:#0e1627; min-height:260px; padding:16px"><h3 style="margin:0 0 8px">(기준 합계 대비) 연료 프리미엄·탄소 절감·순효과</h3><canvas id="barDelta" height="120"></canvas></div>
-      </section>
+
 
     <section class="card">
       <h2>대안 연료 <span class="pill">LNG·Bio·Hydrogen·Methanol</span></h2>
-      <div class="small preset">기본값: <strong>VLSFO (저유황유)</strong> EF 3.114, Slip 0%, GWP 27.2 · <strong>MGO (경유)</strong> EF 3.206, Slip 0%, GWP 27.2 · <strong>LNG (액화천연가스)</strong> EF 2.75, Slip 0.2%, GWP 27.2 · <strong>Bio (바이오연료)</strong> EF 0.5, Slip 0%, GWP 27.2 · <strong>Hydrogen (수소)</strong> EF 0, Slip 0%, GWP 27.2 · <strong>Methanol (메탄올)</strong> EF 1.375, Slip 0%, GWP 27.2</div>
+      <div class="small preset">기본값: <strong>VLSFO (저유황유)</strong> EF 3.114, Slip 0%, GWP 27.2 · <strong>MGO
+          (경유)</strong> EF 3.206, Slip 0%, GWP 27.2 · <strong>LNG (액화천연가스)</strong> EF 2.75, Slip 0.2%, GWP 27.2 ·
+        <strong>Bio (바이오연료)</strong> EF 0.5, Slip 0%, GWP 27.2 · <strong>Hydrogen (수소)</strong> EF 0, Slip 0%, GWP 27.2
+        · <strong>Methanol (메탄올)</strong> EF 1.375, Slip 0%, GWP 27.2</div>
       <div class="row-actions mt8">
         <button class="btn" onclick="addFuel('LNG')">+ LNG (액화천연가스)</button>
         <button class="btn" onclick="addFuel('Bio')">+ Bio (바이오연료)</button>
@@ -230,6 +519,16 @@
       </div>
     </section>
 
+    <section class="card">
+      <h2>차트</h2>
+      <div class="card" style="background:#0e1627" style="background:#0e1627; min-height:320px; padding:16px">
+        <h3 style="margin:0 0 8px">총비용 구성 (기준 각 행 + 합계 + 대안)</h3><canvas id="barStack" height="150"></canvas>
+      </div>
+      <div class="card mt12" style="background:#0e1627" style="background:#0e1627; min-height:260px; padding:16px">
+        <h3 style="margin:0 0 8px">(기준 합계 대비) 연료 프리미엄·탄소 절감·순효과</h3><canvas id="barDelta" height="120"></canvas>
+      </div>
+    </section>
+
     <section id="testPanel" class="card">
       <h2>진단 / 테스트</h2>
       <div class="small">핵심 계산 로직과 "기준 합계" 반영 동작을 점검합니다.</div>
@@ -242,17 +541,17 @@
 
   <script>
     // ---------- Presets ----------
-    const PRESET_ALIASES = { 'H2':'HYDROGEN', 'MEOH':'METHANOL', 'BIO':'BIO', 'LNG':'LNG', 'VLSFO':'VLSFO', 'MGO':'MGO' };
+    const PRESET_ALIASES = { 'H2': 'HYDROGEN', 'MEOH': 'METHANOL', 'BIO': 'BIO', 'LNG': 'LNG', 'VLSFO': 'VLSFO', 'MGO': 'MGO' };
     const PRESETS = {
-      VLSFO:    { ef: 3.114,  slip: 0,   gwp: 27.2, defaultVol: 10000, defaultPrice: 1200000 },
-      MGO:      { ef: 3.206,  slip: 0,   gwp: 27.2, defaultVol: 10000, defaultPrice: 1250000 },
-      LNG:      { ef: 2.75,   slip: 0.2, gwp: 27.2, defaultVol: 10000, defaultPrice: 1000000 },
-      BIO:      { ef: 0.5,    slip: 0,   gwp: 27.2, defaultVol: 10000, defaultPrice: 1400000 },
-      HYDROGEN: { ef: 0,      slip: 0,   gwp: 27.2, defaultVol: 10000, defaultPrice: 6000000 },
-      METHANOL: { ef: 1.375,  slip: 0,   gwp: 27.2, defaultVol: 10000, defaultPrice: 2500000 }
+      VLSFO: { ef: 3.114, slip: 0, gwp: 27.2, defaultVol: 10000, defaultPrice: 1200000 },
+      MGO: { ef: 3.206, slip: 0, gwp: 27.2, defaultVol: 10000, defaultPrice: 1250000 },
+      LNG: { ef: 2.75, slip: 0.2, gwp: 27.2, defaultVol: 10000, defaultPrice: 1000000 },
+      BIO: { ef: 0.5, slip: 0, gwp: 27.2, defaultVol: 10000, defaultPrice: 1400000 },
+      HYDROGEN: { ef: 0, slip: 0, gwp: 27.2, defaultVol: 10000, defaultPrice: 6000000 },
+      METHANOL: { ef: 1.375, slip: 0, gwp: 27.2, defaultVol: 10000, defaultPrice: 2500000 }
     };
 
-    
+
     // ---------- Energy content (MMBtu/mt) for efficiency mode ----------
     const ENERGY = {
       VLSFO: 40.2,
@@ -276,142 +575,142 @@
         inp.addEventListener('input', e => {
           const k = e.target.dataset.key;
           const v = parseFloat(e.target.value);
-          if(k && isFinite(v)) {
+          if (k && isFinite(v)) {
             ENERGY[k] = v;
             recomputeAllEffRows();
           }
         });
       });
     }
-    function getEnergyPerMt(key){
-      const k = (key||'').toString().toUpperCase().trim();
-      if(ENERGY[k]!==undefined) return ENERGY[k];
+    function getEnergyPerMt(key) {
+      const k = (key || '').toString().toUpperCase().trim();
+      if (ENERGY[k] !== undefined) return ENERGY[k];
       // fuzzy contains match
-      for(const kk of Object.keys(ENERGY)){ if(k.includes(kk)) return ENERGY[kk]; }
+      for (const kk of Object.keys(ENERGY)) { if (k.includes(kk)) return ENERGY[kk]; }
       return 0;
     }
 
     // ---------- Market reference snapshot (editable) ----------
     // USD/mt values taken from public sources as of 2025-10-02 (see chat for citations)
     const MARKET = [
-      { key:'VLSFO',   name:'VLSFO (저유황유)',      usd: 516.5, src:'Ship & Bunker — Global 20 Avg' },
-      { key:'MGO',     name:'MGO (경유)',           usd: 767.5, src:'Ship & Bunker — Global 20 Avg' },
-      { key:'BIO',     name:'Bio (바이오연료)',    usd: 717.5, src:'Ship & Bunker — Singapore B24 (2025-09-29)' },
-      { key:'LNG',     name:'LNG (액화천연가스)',    usd: +(11.05*52).toFixed(1), note:'JKM 11.05 $/MMBtu × 52 MMBtu/mt' , src:'JKM futures (converted)' },
-      { key:'METHANOL',name:'Methanol (메탄올)',     usd: 360,   src:'Methanex APCP (Asia)' },
-  { key:'HYDROGEN',name:'Hydrogen (수소)',       usd: 4000, src:'EEX HYDRIX (weekly, region-specific)' }
+      { key: 'VLSFO', name: 'VLSFO (저유황유)', usd: 516.5, src: 'Ship & Bunker — Global 20 Avg' },
+      { key: 'MGO', name: 'MGO (경유)', usd: 767.5, src: 'Ship & Bunker — Global 20 Avg' },
+      { key: 'BIO', name: 'Bio (바이오연료)', usd: 717.5, src: 'Ship & Bunker — Singapore B24 (2025-09-29)' },
+      { key: 'LNG', name: 'LNG (액화천연가스)', usd: +(11.05 * 52).toFixed(1), note: 'JKM 11.05 $/MMBtu × 52 MMBtu/mt', src: 'JKM futures (converted)' },
+      { key: 'METHANOL', name: 'Methanol (메탄올)', usd: 360, src: 'Methanex APCP (Asia)' },
+      { key: 'HYDROGEN', name: 'Hydrogen (수소)', usd: 4000, src: 'EEX HYDRIX (weekly, region-specific)' }
     ];
 
     // ---------- Utilities ----------
-    function fmt(n){ return (n===null || n===undefined || n==='')? '-' : (isFinite(n)? (+n).toLocaleString('ko-KR') : n); }
-    function num(v){ const n = +v; return isFinite(n)? n : 0; }
+    function fmt(n) { return (n === null || n === undefined || n === '') ? '-' : (isFinite(n) ? (+n).toLocaleString('ko-KR') : n); }
+    function num(v) { const n = +v; return isFinite(n) ? n : 0; }
     let barStack = null, barDelta = null;
     let ROWSEQ = 1;
 
     // ---- Visibility helpers for annual-volume mode ----
-    function _setVolCellVisibility(tr, isBaseline){
+    function _setVolCellVisibility(tr, isBaseline) {
       const tdVol = tr.children[1];
-      const modeSel = isBaseline? '.b-mode' : '.mode';
+      const modeSel = isBaseline ? '.b-mode' : '.mode';
       const mode = tr.querySelector(modeSel).value;
       const inputVol = tdVol.querySelector('input');
-      if(!inputVol) return;
-      if(mode==='annual'){
-        if(tdVol.dataset.show === '1'){ inputVol.classList.remove('hidden'); }
+      if (!inputVol) return;
+      if (mode === 'annual') {
+        if (tdVol.dataset.show === '1') { inputVol.classList.remove('hidden'); }
         else { inputVol.classList.add('hidden'); }
       } else {
         inputVol.classList.remove('hidden');
       }
     }
-    
-    function populateEffRefOptions(sel){
-      const opts = ['<option value="">기준 선택</option>','<option value="__SUM__">기준 합계(모든 기준)</option>'];
+
+    function populateEffRefOptions(sel) {
+      const opts = ['<option value="">기준 선택</option>', '<option value="__SUM__">기준 합계(모든 기준)</option>'];
       const bases = collectBaselines();
-      bases.forEach((b,i)=>{ opts.push(`<option value="${b.id}">${b.name||('기준'+(i+1))}</option>`); });
+      bases.forEach((b, i) => { opts.push(`<option value="${b.id}">${b.name || ('기준' + (i + 1))}</option>`); });
       sel.innerHTML = opts.join('');
     }
-    function toggleEffControls(tr){
+    function toggleEffControls(tr) {
       const mode = tr.querySelector('.mode').value;
       const refSel = tr.querySelector('.eff-ref');
       const hintEl = tr.querySelector('.eff-hint');
       const volInput = tr.children[1].querySelector('input');
-      if(mode==='eff'){
-        refSel.style.display=''; hintEl.style.display=''; volInput.readOnly = true;
-        if(!refSel.options.length) populateEffRefOptions(refSel);
+      if (mode === 'eff') {
+        refSel.style.display = ''; hintEl.style.display = ''; volInput.readOnly = true;
+        if (!refSel.options.length) populateEffRefOptions(refSel);
       } else {
-        refSel.style.display='none'; hintEl.style.display='none'; volInput.readOnly = false;
+        refSel.style.display = 'none'; hintEl.style.display = 'none'; volInput.readOnly = false;
       }
     }
-    function effectiveBaselineVolume(b){ // tons
-      if(!b) return 0;
+    function effectiveBaselineVolume(b) { // tons
+      if (!b) return 0;
       let v = +b.vol;
-      if(!isFinite(v) || v<=0){
-        if(b.mode==='annual'){
-          const price = getMarketKrwPerMtByKey((b.name||'').toUpperCase());
+      if (!isFinite(v) || v <= 0) {
+        if (b.mode === 'annual') {
+          const price = getMarketKrwPerMtByKey((b.name || '').toUpperCase());
           const annual = annualTotalFromRow(b.tr, true);
-          if(price && annual){ v = annual / price; }
+          if (price && annual) { v = annual / price; }
         }
       }
-      return (isFinite(v) && v>0) ? v : 0;
+      return (isFinite(v) && v > 0) ? v : 0;
     }
-    function computeEffRow(tr){
-      try{
-        const nameVal = (tr.querySelector('.fname').value||'').trim();
+    function computeEffRow(tr) {
+      try {
+        const nameVal = (tr.querySelector('.fname').value || '').trim();
         const modeVal = tr.querySelector('.mode').value;
-        if(modeVal!=='eff') return;
+        if (modeVal !== 'eff') return;
         const refSel = tr.querySelector('.eff-ref');
         const hintEl = tr.querySelector('.eff-hint');
         const volInput = tr.children[1].querySelector('input');
         const priceInp = tr.children[3].querySelector('.priceOrAnnual');
 
         // 기준연료 미선택 시 자동계산 방지 및 0으로 초기화
-        if(!refSel || !refSel.value || refSel.value === ""){
-          if(volInput) volInput.value = 0;
-          if(priceInp) priceInp.value = 0;
-          if(hintEl) hintEl.textContent = '기준연료를 먼저 선택하세요.';
+        if (!refSel || !refSel.value || refSel.value === "") {
+          if (volInput) volInput.value = 0;
+          if (priceInp) priceInp.value = 0;
+          if (hintEl) hintEl.textContent = '기준연료를 먼저 선택하세요.';
           return;
         }
 
         // 1) unit price from MARKET
         const mKrw = getMarketKrwPerMtByKey(nameVal.toUpperCase());
-        if(mKrw && priceInp){ priceInp.value = Math.round(mKrw); }
+        if (mKrw && priceInp) { priceInp.value = Math.round(mKrw); }
 
         // 2) energy-based volume
         const eAlt = getEnergyPerMt(nameVal);
-        if(!(eAlt>0)){ if(hintEl) hintEl.textContent = '대안 에너지함량 없음 (ENERGY 설정)'; return; }
+        if (!(eAlt > 0)) { if (hintEl) hintEl.textContent = '대안 에너지함량 없음 (ENERGY 설정)'; return; }
 
         const bases = collectBaselines();
-        if(!bases.length){ if(hintEl) hintEl.textContent='기준 행이 없습니다.'; return; }
+        if (!bases.length) { if (hintEl) hintEl.textContent = '기준 행이 없습니다.'; return; }
 
         let totalBaseEnergy = 0;
-        if(refSel && refSel.value==='__SUM__'){
-          bases.forEach(b=>{ totalBaseEnergy += effectiveBaselineVolume(b) * getEnergyPerMt(b.name); });
+        if (refSel && refSel.value === '__SUM__') {
+          bases.forEach(b => { totalBaseEnergy += effectiveBaselineVolume(b) * getEnergyPerMt(b.name); });
         } else {
-          const ref = bases.find(b=> b.id===(refSel && refSel.value)) || bases[0];
+          const ref = bases.find(b => b.id === (refSel && refSel.value)) || bases[0];
           totalBaseEnergy = effectiveBaselineVolume(ref) * getEnergyPerMt(ref.name);
         }
-        if(!(totalBaseEnergy>0)){ if(hintEl) hintEl.textContent='기준 에너지/시세/연간비용 확인'; return; }
+        if (!(totalBaseEnergy > 0)) { if (hintEl) hintEl.textContent = '기준 에너지/시세/연간비용 확인'; return; }
 
         const volAlt = totalBaseEnergy / eAlt;
-        if(isFinite(volAlt) && volInput){
-          volInput.value = (Math.round(volAlt*100)/100).toFixed(2);
-          const tdVol = tr.children[1]; tdVol.dataset.show='1'; _setVolCellVisibility(tr,false);
+        if (isFinite(volAlt) && volInput) {
+          volInput.value = (Math.round(volAlt * 100) / 100).toFixed(2);
+          const tdVol = tr.children[1]; tdVol.dataset.show = '1'; _setVolCellVisibility(tr, false);
         }
-        if(hintEl){
-          const label = (refSel && refSel.value==='__SUM__') ? '합계' : (bases.find(b=> b.id===(refSel && refSel.value))?.name || bases[0].name);
+        if (hintEl) {
+          const label = (refSel && refSel.value === '__SUM__') ? '합계' : (bases.find(b => b.id === (refSel && refSel.value))?.name || bases[0].name);
           const unitTxt = priceInp && priceInp.value ? Number(priceInp.value).toLocaleString('ko-KR') : '-';
           hintEl.textContent = `기준: ${label} → 환산 ${volInput.value} 톤 · 단가 ${unitTxt} ₩/톤`;
         }
-      }catch(e){}
+      } catch (e) { }
     }
-    function recomputeAllEffRows(){
-      [...fuelBody.querySelectorAll('tr')].forEach(tr=> computeEffRow(tr));
+    function recomputeAllEffRows() {
+      [...fuelBody.querySelectorAll('tr')].forEach(tr => computeEffRow(tr));
       recalc();
     }
 
 
-    function refreshAllVolVisibility(){
-      [...baselineBody.querySelectorAll('tr.baseline')].forEach(tr=> _setVolCellVisibility(tr,true));
-      [...fuelBody.querySelectorAll('tr')].forEach(tr=> _setVolCellVisibility(tr,false));
+    function refreshAllVolVisibility() {
+      [...baselineBody.querySelectorAll('tr.baseline')].forEach(tr => _setVolCellVisibility(tr, true));
+      [...fuelBody.querySelectorAll('tr')].forEach(tr => _setVolCellVisibility(tr, false));
     }
 
 
@@ -421,169 +720,169 @@
     const marketBody = document.getElementById('marketBody');
 
     // ----- Market table rendering -----
-    function renderMarket(){
-      
+    function renderMarket() {
+
       const fx = num(document.getElementById('fxUSDKRW').value || 0);
       marketBody.innerHTML = '';
-      MARKET.forEach((m, idx)=>{
+      MARKET.forEach((m, idx) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><input class="m-name" value="${m.name||''}" placeholder="유종명"/></td>
+          <td><input class="m-name" value="${m.name || ''}" placeholder="유종명"/></td>
           <td><input class="m-usd" type="number" step="0.1" value="${m.usd}"/></td>
-          <td class="right m-krw">${m.usd? (m.usd*fx).toLocaleString('ko-KR'): '-'}</td>
-          <td><input class="m-src" value="${m.note? (m.src+' — '+m.note) : (m.src||'')}" placeholder="출처"/></td>
+          <td class="right m-krw">${m.usd ? (m.usd * fx).toLocaleString('ko-KR') : '-'}</td>
+          <td><input class="m-src" value="${m.note ? (m.src + ' — ' + m.note) : (m.src || '')}" placeholder="출처"/></td>
           <td class="row-actions">
             <button class="btn ghost m-del" type="button">삭제</button>
           </td>`;
         marketBody.appendChild(tr);
       });
       // bind inputs
-      marketBody.querySelectorAll('tr').forEach((row,i)=>{
+      marketBody.querySelectorAll('tr').forEach((row, i) => {
         const nameInp = row.querySelector('.m-name');
         const usdInp = row.querySelector('.m-usd');
         const srcInp = row.querySelector('.m-src');
         const krwCell = row.querySelector('.m-krw');
         const delBtn = row.querySelector('.m-del');
 
-        nameInp.addEventListener('input', ()=>{
+        nameInp.addEventListener('input', () => {
           MARKET[i].name = nameInp.value;
-          MARKET[i].key  = normalizeKey(nameInp.value);
+          MARKET[i].key = normalizeKey(nameInp.value);
         });
-        usdInp.addEventListener('input', ()=>{
+        usdInp.addEventListener('input', () => {
           MARKET[i].usd = num(usdInp.value);
-          krwCell.textContent = MARKET[i].usd? (MARKET[i].usd * num(document.getElementById('fxUSDKRW').value)).toLocaleString('ko-KR') : '-';
+          krwCell.textContent = MARKET[i].usd ? (MARKET[i].usd * num(document.getElementById('fxUSDKRW').value)).toLocaleString('ko-KR') : '-';
         });
-        srcInp.addEventListener('input', ()=>{
+        srcInp.addEventListener('input', () => {
           MARKET[i].src = srcInp.value;
         });
-        delBtn.addEventListener('click', ()=>{
-          MARKET.splice(i,1);
+        delBtn.addEventListener('click', () => {
+          MARKET.splice(i, 1);
           renderMarket();
         });
       });
-}
+    }
 
-    document.getElementById('fxUSDKRW').addEventListener('input', ()=>{ renderMarket(); recomputeAllEffRows(); });
+    document.getElementById('fxUSDKRW').addEventListener('input', () => { renderMarket(); recomputeAllEffRows(); });
     const btnMarketAdd = document.getElementById('btnMarketAdd');
-    if(btnMarketAdd){ btnMarketAdd.addEventListener('click', ()=>{ MARKET.push({ key:'CUSTOM', name:'Custom', usd:'', src:'' }); renderMarket(); }); }
+    if (btnMarketAdd) { btnMarketAdd.addEventListener('click', () => { MARKET.push({ key: 'CUSTOM', name: 'Custom', usd: '', src: '' }); renderMarket(); }); }
 
     // ----- Annual volume auto-calc from Market -----
-    function getMarketKrwPerMtByKey(key){
-      const fx = num(document.getElementById('fxUSDKRW').value||0);
-      const idx = MARKET.findIndex(m=> m.key===key);
-      if(idx<0) return null;
+    function getMarketKrwPerMtByKey(key) {
+      const fx = num(document.getElementById('fxUSDKRW').value || 0);
+      const idx = MARKET.findIndex(m => m.key === key);
+      if (idx < 0) return null;
       const usdInput = marketBody.querySelectorAll('input.m-usd')[idx];
       const usd = usdInput ? num(usdInput.value) : num(MARKET[idx].usd);
-      if(!usd || !fx) return null;
+      if (!usd || !fx) return null;
       return usd * fx; // KRW/mt
     }
 
-    function annualTotalFromRow(tr, isBaseline){
+    function annualTotalFromRow(tr, isBaseline) {
       // samples sum if present, else priceOrAnnual
       const samples = getSamples(tr);
-      if(samples.length){ return samples.reduce((a,b)=>a+b,0); }
-      const sel = isBaseline? '.b-priceOrAnnual' : '.priceOrAnnual';
+      if (samples.length) { return samples.reduce((a, b) => a + b, 0); }
+      const sel = isBaseline ? '.b-priceOrAnnual' : '.priceOrAnnual';
       return num(tr.querySelector(sel).value);
     }
 
-    function computeVolumesFromMarket(scope){
-      let updated=0, skipped=0;
-      const applyRow = (tr, isBaseline)=>{
-        const nameSel = isBaseline? '.b-fname' : '.fname';
-        const modeSel = isBaseline? '.b-mode' : '.mode';
-        const volSel  = isBaseline? '.b-vol'  : 'td:nth-child(2) input';
-        const fuelName = (tr.querySelector(nameSel).value||'').trim();
+    function computeVolumesFromMarket(scope) {
+      let updated = 0, skipped = 0;
+      const applyRow = (tr, isBaseline) => {
+        const nameSel = isBaseline ? '.b-fname' : '.fname';
+        const modeSel = isBaseline ? '.b-mode' : '.mode';
+        const volSel = isBaseline ? '.b-vol' : 'td:nth-child(2) input';
+        const fuelName = (tr.querySelector(nameSel).value || '').trim();
         const mode = tr.querySelector(modeSel).value;
-        if(mode !== 'annual') { skipped++; return; }
+        if (mode !== 'annual') { skipped++; return; }
         const key = normalizeKey(fuelName);
         const krwPerMt = getMarketKrwPerMtByKey(key);
-        if(!krwPerMt){ skipped++; return; }
+        if (!krwPerMt) { skipped++; return; }
         const annual = annualTotalFromRow(tr, isBaseline);
-        if(!annual){ skipped++; return; }
+        if (!annual) { skipped++; return; }
         const vol = annual / krwPerMt;
-        const volInput = isBaseline? tr.querySelector(volSel) : tr.querySelector(volSel);
-        if(volInput){ volInput.value = (Math.round(vol*100)/100).toFixed(2); updated++; }
+        const volInput = isBaseline ? tr.querySelector(volSel) : tr.querySelector(volSel);
+        if (volInput) { volInput.value = (Math.round(vol * 100) / 100).toFixed(2); updated++; }
       };
 
-      if(scope==='baseline' || scope==='both'){
-        [...baselineBody.querySelectorAll('tr.baseline')].forEach(tr=> applyRow(tr,true));
+      if (scope === 'baseline' || scope === 'both') {
+        [...baselineBody.querySelectorAll('tr.baseline')].forEach(tr => applyRow(tr, true));
       }
-      if(scope==='alt' || scope==='both'){
-        [...fuelBody.querySelectorAll('tr')].forEach(tr=> applyRow(tr,false));
+      if (scope === 'alt' || scope === 'both') {
+        [...fuelBody.querySelectorAll('tr')].forEach(tr => applyRow(tr, false));
       }
       recalc(); refreshAllVolVisibility && refreshAllVolVisibility();
       // reveal all annual volume inputs after computation
-      [...baselineBody.querySelectorAll('tr.baseline')].forEach(tr=>{ 
-        if(tr.querySelector('.b-mode').value==='annual'){ 
-          tr.children[1].dataset.show='1'; 
-          _setVolCellVisibility(tr,true); 
-        } 
+      [...baselineBody.querySelectorAll('tr.baseline')].forEach(tr => {
+        if (tr.querySelector('.b-mode').value === 'annual') {
+          tr.children[1].dataset.show = '1';
+          _setVolCellVisibility(tr, true);
+        }
       });
-      [...fuelBody.querySelectorAll('tr')].forEach(tr=>{ 
-        if(tr.querySelector('.mode').value==='annual'){ 
-          tr.children[1].dataset.show='1'; 
-          _setVolCellVisibility(tr,false); 
-        } 
+      [...fuelBody.querySelectorAll('tr')].forEach(tr => {
+        if (tr.querySelector('.mode').value === 'annual') {
+          tr.children[1].dataset.show = '1';
+          _setVolCellVisibility(tr, false);
+        }
       });
-const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀: ${skipped}개`;
+      const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀: ${skipped}개`;
       console.log(msg);
       // 간단 알림
-      if(typeof window?.alert === 'function'){
+      if (typeof window?.alert === 'function') {
         // 너무 잦은 alert 방지: 최소 피드백만
-        setTimeout(()=>alert(msg), 0);
+        setTimeout(() => alert(msg), 0);
       }
     }
 
     // Wire buttons in Market box
     const btnCalcVolBase = document.getElementById('btnCalcVolBase');
-    const btnCalcVolAlt  = document.getElementById('btnCalcVolAlt');
-    const btnCalcVolAll  = document.getElementById('btnCalcVolAll');
-    if(btnCalcVolBase) btnCalcVolBase.addEventListener('click', ()=> computeVolumesFromMarket('baseline'));
-    if(btnCalcVolAlt)  btnCalcVolAlt.addEventListener('click', ()=> computeVolumesFromMarket('alt'));
-    if(btnCalcVolAll)  btnCalcVolAll.addEventListener('click', ()=> computeVolumesFromMarket('both'));
+    const btnCalcVolAlt = document.getElementById('btnCalcVolAlt');
+    const btnCalcVolAll = document.getElementById('btnCalcVolAll');
+    if (btnCalcVolBase) btnCalcVolBase.addEventListener('click', () => computeVolumesFromMarket('baseline'));
+    if (btnCalcVolAlt) btnCalcVolAlt.addEventListener('click', () => computeVolumesFromMarket('alt'));
+    if (btnCalcVolAll) btnCalcVolAll.addEventListener('click', () => computeVolumesFromMarket('both'));
 
     // ----- Button bindings (baseline add & import/export) -----
     const btnV = document.getElementById('btnAddBaseVLSFO');
     const btnM = document.getElementById('btnAddBaseMGO');
     const btnC = document.getElementById('btnAddBaseCustom');
-    if(btnV) btnV.addEventListener('click', ()=> addBaseline('VLSFO'));
-    if(btnM) btnM.addEventListener('click', ()=> addBaseline('MGO'));
-    if(btnC) btnC.addEventListener('click', ()=> addBaseline('Custom'));
+    if (btnV) btnV.addEventListener('click', () => addBaseline('VLSFO'));
+    if (btnM) btnM.addEventListener('click', () => addBaseline('MGO'));
+    if (btnC) btnC.addEventListener('click', () => addBaseline('Custom'));
 
     // JSON Export / Import wiring
     const btnExport = document.getElementById('exportJson');
     const inpImport = document.getElementById('importJsonInput');
-    if(btnExport){
-      btnExport.addEventListener('click', ()=>{
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
         const data = exportData();
-        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = 'bunkering_config.json'; a.click();
         URL.revokeObjectURL(url);
       });
     }
-    if(inpImport){
-      inpImport.addEventListener('change', (e)=>{
+    if (inpImport) {
+      inpImport.addEventListener('change', (e) => {
         const f = e.target.files && e.target.files[0];
-        if(!f) return;
+        if (!f) return;
         const fr = new FileReader();
-        fr.onload = ()=>{
-          try{ const data = JSON.parse(fr.result); importData(data); }
-          catch(err){ alert('JSON 파싱 오류: '+ err.message); }
+        fr.onload = () => {
+          try { const data = JSON.parse(fr.result); importData(data); }
+          catch (err) { alert('JSON 파싱 오류: ' + err.message); }
         };
         fr.readAsText(f);
       });
     }
 
-    function addFromMarket(idx){
+    function addFromMarket(idx) {
       const m = MARKET[idx];
       addFuel(m.key);
       const last = fuelBody.lastElementChild;
       // mode: unit, set price = KRW/mt
       const fx = num(document.getElementById('fxUSDKRW').value || 0);
       const usdInput = marketBody.querySelectorAll('input.m-usd')[idx];
-      const usd = num(usdInput? usdInput.value : m.usd);
+      const usd = num(usdInput ? usdInput.value : m.usd);
       const krw = Math.round(usd * fx);
       last.children[3].querySelector('.priceOrAnnual').value = krw;
       // apply preset EF/Slip/GWP already handled by addFuel; no-op
@@ -591,11 +890,11 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
     }
 
     // ----- Samples UI (baseline & fuel rows) -----
-    function toggleSamples(btn){
+    function toggleSamples(btn) {
       const mainTr = btn.closest('tr');
       let sampleTr = mainTr.nextElementSibling;
       const colSpan = mainTr.children.length;
-      if(!sampleTr || !sampleTr.classList.contains('sample-row')){
+      if (!sampleTr || !sampleTr.classList.contains('sample-row')) {
         sampleTr = document.createElement('tr');
         sampleTr.className = 'sample-row';
         sampleTr.innerHTML = `<td colspan="${colSpan}">
@@ -608,34 +907,34 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
         </td>`;
         mainTr.parentNode.insertBefore(sampleTr, mainTr.nextSibling);
       } else {
-        sampleTr.style.display = (sampleTr.style.display==='none') ? '' : 'none';
+        sampleTr.style.display = (sampleTr.style.display === 'none') ? '' : 'none';
       }
       recalc(); refreshAllVolVisibility();
     }
 
-    function addSampleRow(el){
+    function addSampleRow(el) {
       const wrap = el.closest('td');
       const tbody = wrap.querySelector('tbody');
       const tr = document.createElement('tr');
       tr.innerHTML = '<td class="right"></td><td><input type="number" value="0" step="1000" min="0"/></td><td><button class="btn" type="button" onclick="this.closest(\'tr\').remove(); recalc();">삭제</button></td>';
       tbody.appendChild(tr);
-      [...tbody.querySelectorAll('tr')].forEach((row,i)=> row.children[0].textContent = i+1);
-      tbody.querySelectorAll('input').forEach(inp=> inp.addEventListener('input', recalc));
+      [...tbody.querySelectorAll('tr')].forEach((row, i) => row.children[0].textContent = i + 1);
+      tbody.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
     }
 
-    function getSamples(tr){
+    function getSamples(tr) {
       const row = tr.nextElementSibling;
-      if(!row || !row.classList || !row.classList.contains('sample-row')) return [];
-      return [...row.querySelectorAll('tbody input')].map(i=> num(i.value)).filter(v=>v>0);
+      if (!row || !row.classList || !row.classList.contains('sample-row')) return [];
+      return [...row.querySelectorAll('tbody input')].map(i => num(i.value)).filter(v => v > 0);
     }
 
     // ----- Baseline rows -----
-    function addBaseline(kind){
+    function addBaseline(kind) {
       const tr = document.createElement('tr');
       tr.className = 'baseline';
       const upper = normalizeKey(kind);
-      const preset = PRESETS[upper] || { ef:0, slip:0, gwp:27.2, defaultVol:0, defaultPrice:0 };
-      const d = { name: kind||'', vol: preset.defaultVol, price: preset.defaultPrice, ef: preset.ef, cprice: 0, slip: preset.slip, gwp: preset.gwp };
+      const preset = PRESETS[upper] || { ef: 0, slip: 0, gwp: 27.2, defaultVol: 0, defaultPrice: 0 };
+      const d = { name: kind || '', vol: preset.defaultVol, price: preset.defaultPrice, ef: preset.ef, cprice: 0, slip: preset.slip, gwp: preset.gwp };
       tr.innerHTML = `
         <td>
           <div style="display:flex; flex-direction:column; gap:4px">
@@ -652,16 +951,16 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
         <td><input class="b-gwp" type="number" value="${d.gwp}" step="0.1" min="0"/></td>
         <td class="row-actions"><button class="btn ghost" type="button" onclick="toggleSamples(this)">리스트</button></td>
         <td class="row-actions"><button class="btn" type="button" onclick="removeBaselineRow(this)">삭제</button></td>`;
-  // 고유 id 부여
-  tr.dataset.rowid = 'base_' + Math.random().toString(36).substr(2,9);
-  baselineBody.appendChild(tr);
-      tr.querySelectorAll('input,select').forEach(i=> i.addEventListener('input', ()=>{
-        populateEffRefOptions && document.querySelectorAll('#tblFuel .eff-ref').forEach(s=>populateEffRefOptions(s));
+      // 고유 id 부여
+      tr.dataset.rowid = 'base_' + Math.random().toString(36).substr(2, 9);
+      baselineBody.appendChild(tr);
+      tr.querySelectorAll('input,select').forEach(i => i.addEventListener('input', () => {
+        populateEffRefOptions && document.querySelectorAll('#tblFuel .eff-ref').forEach(s => populateEffRefOptions(s));
         recomputeAllEffRows();
         recalc();
       }));
       const modeSel = tr.querySelector('.b-mode');
-      modeSel.addEventListener('change', ()=>{
+      modeSel.addEventListener('change', () => {
         const tdVol = tr.children[1];
         delete tdVol.dataset.show; // reset reveal flag for annual
         _setVolCellVisibility(tr, true);
@@ -669,51 +968,51 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
       });
       _setVolCellVisibility(tr, true);
 
-      tr.querySelector('.b-fname').addEventListener('change', (e)=>{
-        if(applyPresetToRow(tr, e.target.value)) recalc();
+      tr.querySelector('.b-fname').addEventListener('change', (e) => {
+        if (applyPresetToRow(tr, e.target.value)) recalc();
         recomputeAllEffRows();
         recalc();
       });
       recalc(); refreshAllVolVisibility();
     }
 
-    function removeBaselineRow(btn){
+    function removeBaselineRow(btn) {
       const tr = btn.closest('tr');
       const all = document.querySelectorAll('#tblBase tbody tr.baseline');
-      if(all.length<=1){ alert('최소 1개의 기준은 유지해야 합니다.'); return; }
+      if (all.length <= 1) { alert('최소 1개의 기준은 유지해야 합니다.'); return; }
       const next = tr.nextElementSibling;
-      if(next && next.classList && next.classList.contains('sample-row')) next.remove();
+      if (next && next.classList && next.classList.contains('sample-row')) next.remove();
       tr.remove();
       recalc(); refreshAllVolVisibility();
     }
 
-    function readBaseline(tr){
+    function readBaseline(tr) {
       return {
         tr,
         id: tr.dataset.rowid,
-        name: tr.querySelector('.b-fname').value.trim()||'기준',
-        vol:  num(tr.querySelector('.b-vol').value),
+        name: tr.querySelector('.b-fname').value.trim() || '기준',
+        vol: num(tr.querySelector('.b-vol').value),
         mode: tr.querySelector('.b-mode').value,
         priceOrAnnual: num(tr.querySelector('.b-priceOrAnnual').value),
-        ef:   num(tr.querySelector('.b-ef').value),
+        ef: num(tr.querySelector('.b-ef').value),
         cprice: num(tr.querySelector('.b-cprice').value),
         slip: num(tr.querySelector('.b-slip').value),
-        gwp:  num(tr.querySelector('.b-gwp').value),
+        gwp: num(tr.querySelector('.b-gwp').value),
         samples: getSamples(tr)
       };
     }
 
     // ----- Alternative fuels -----
-    function normalizeKey(name){
-      const key = (name||'').trim().toUpperCase();
+    function normalizeKey(name) {
+      const key = (name || '').trim().toUpperCase();
       return PRESETS[key] ? key : (PRESET_ALIASES[key] || key);
     }
 
-    function applyPresetToRow(tr, fuelName){
+    function applyPresetToRow(tr, fuelName) {
       const key = normalizeKey(fuelName);
       const p = PRESETS[key];
-      if(!p) return false;
-      if(tr.classList.contains('baseline')){
+      if (!p) return false;
+      if (tr.classList.contains('baseline')) {
         tr.querySelector('.b-ef').value = p.ef;
         tr.querySelector('.b-slip').value = p.slip;
         tr.querySelector('.b-gwp').value = p.gwp;
@@ -725,13 +1024,13 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
       return true;
     }
 
-    function addFuel(kind){
+    function addFuel(kind) {
       const tr = document.createElement('tr');
       const upper = normalizeKey(kind);
       const preset = PRESETS[upper];
       // 프리셋이 아닌 경우 연간사용량과 단가 0으로 초기화
       const d = {
-        name: kind||'',
+        name: kind || '',
         vol: preset ? preset.defaultVol : 0,
         price: preset ? preset.defaultPrice : 0,
         ef: preset ? preset.ef : 0,
@@ -757,19 +1056,19 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
         <td class="row-actions"><button class="btn" onclick="this.closest('tr').remove(); recalc();">삭제</button></td>`;
 
       fuelBody.appendChild(tr);
-      tr.querySelectorAll('input,select').forEach(i=> i.addEventListener('input', recalc));
+      tr.querySelectorAll('input,select').forEach(i => i.addEventListener('input', recalc));
       const modeSel = tr.querySelector('.mode');
       // 모드 변경 시
-      modeSel.addEventListener('change', ()=>{
-        _setVolCellVisibility(tr,false);
+      modeSel.addEventListener('change', () => {
+        _setVolCellVisibility(tr, false);
         toggleEffControls(tr);
-        if(tr.querySelector('.mode').value==='eff'){
-          const volInput=tr.children[1].querySelector('input');
-          if(volInput){ volInput.value=''; }
-          const priceInp=tr.children[3].querySelector('.priceOrAnnual');
-          if(priceInp){ priceInp.value=''; }
-          const sel=tr.querySelector('.eff-ref');
-          if(sel){ sel.focus(); }
+        if (tr.querySelector('.mode').value === 'eff') {
+          const volInput = tr.children[1].querySelector('input');
+          if (volInput) { volInput.value = ''; }
+          const priceInp = tr.children[3].querySelector('.priceOrAnnual');
+          if (priceInp) { priceInp.value = ''; }
+          const sel = tr.querySelector('.eff-ref');
+          if (sel) { sel.focus(); }
         }
         computeEffRow(tr);
         recalc();
@@ -777,31 +1076,31 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
       _setVolCellVisibility(tr, false);
       toggleEffControls(tr);
       const effSel = tr.querySelector('.eff-ref');
-      effSel.addEventListener('change', ()=>{
+      effSel.addEventListener('change', () => {
         recomputeAllEffRows(); // 모든 대안연료 효율모드 행 재계산
         recalc();
       });
 
       // 연료명 변경 시
       const fnameInput = tr.querySelector('.fname');
-      fnameInput.addEventListener('change', (e)=>{
-        if(applyPresetToRow(tr, e.target.value)) recalc();
+      fnameInput.addEventListener('change', (e) => {
+        if (applyPresetToRow(tr, e.target.value)) recalc();
         recomputeAllEffRows();
         recalc();
       });
       // 연료명 입력 실시간 반영 (input 이벤트)
-      fnameInput.addEventListener('input', ()=>{
+      fnameInput.addEventListener('input', () => {
         computeEffRow(tr);
         recalc();
       });
       recalc(); refreshAllVolVisibility();
     }
 
-    function collectFuels(){
+    function collectFuels() {
       const rows = [...fuelBody.querySelectorAll('tr')];
-      return rows.map(tr=>({
+      return rows.map(tr => ({
         tr,
-        name: tr.querySelector('.fname').value.trim()||'연료',
+        name: tr.querySelector('.fname').value.trim() || '연료',
         vol: num(tr.children[1].querySelector('input').value),
         mode: tr.children[2].querySelector('select').value,
         priceOrAnnual: num(tr.children[3].querySelector('.priceOrAnnual').value),
@@ -813,205 +1112,209 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
       }));
     }
 
-    function avg(arr){ if(!arr.length) return 0; return arr.reduce((a,b)=>a+b,0)/arr.length; }
+    function avg(arr) { if (!arr.length) return 0; return arr.reduce((a, b) => a + b, 0) / arr.length; }
 
-    function calcCost(vol, mode, priceOrAnnual, samples, ef, cprice, slipPct, gwp){
+    function calcCost(vol, mode, priceOrAnnual, samples, ef, cprice, slipPct, gwp) {
       let fuelCost = 0; let hint = null;
-      if(mode==='annual'){
-        const sum = samples.length? samples.reduce((a,b)=>a+b,0) : priceOrAnnual; // 합산
-        const mean = samples.length? (sum/samples.length) : priceOrAnnual; // 표시용 평균
+      if (mode === 'annual') {
+        const sum = samples.length ? samples.reduce((a, b) => a + b, 0) : priceOrAnnual; // 합산
+        const mean = samples.length ? (sum / samples.length) : priceOrAnnual; // 표시용 평균
         fuelCost = sum; hint = mean;
       } else {
-        const mean = (samples.length? avg(samples) : priceOrAnnual);
+        const mean = (samples.length ? avg(samples) : priceOrAnnual);
         fuelCost = vol * mean; hint = mean;
       }
-      const co2e = (vol * ef) + (vol * (slipPct/100) * gwp);
+      const co2e = (vol * ef) + (vol * (slipPct / 100) * gwp);
       const carbon = co2e * cprice;
-      return {fuelCost, carbon, hint};
+      return { fuelCost, carbon, hint };
     }
 
-    function collectBaselines(){
+    function collectBaselines() {
       return [...baselineBody.querySelectorAll('tr.baseline')].map(readBaseline);
     }
 
-    function recalc(){
+    function recalc() {
       // Baseline (sum over rows)
       const baselines = collectBaselines();
-      if(baselines.length===0){ addBaseline('VLSFO'); return; }
-      const baseRowsCalcs = baselines.map(b=>({ name:b.name, ...calcCost(b.vol,b.mode,b.priceOrAnnual,b.samples,b.ef,b.cprice,b.slip,b.gwp) }));
-      const baseFuelSum = baseRowsCalcs.reduce((s,x)=>s+x.fuelCost,0);
-      const baseCarbonSum = baseRowsCalcs.reduce((s,x)=>s+x.carbon,0);
+      if (baselines.length === 0) { addBaseline('VLSFO'); return; }
+      const baseRowsCalcs = baselines.map(b => ({ name: b.name, ...calcCost(b.vol, b.mode, b.priceOrAnnual, b.samples, b.ef, b.cprice, b.slip, b.gwp) }));
+      const baseFuelSum = baseRowsCalcs.reduce((s, x) => s + x.fuelCost, 0);
+      const baseCarbonSum = baseRowsCalcs.reduce((s, x) => s + x.carbon, 0);
 
-      document.getElementById('kpiBaseFuel').textContent = '₩ '+fmt(baseFuelSum);
-      document.getElementById('kpiBaseCarbon').textContent = '₩ '+fmt(baseCarbonSum);
-      document.getElementById('kpiBaseTotal').textContent = '₩ '+fmt(baseFuelSum + baseCarbonSum);
+      document.getElementById('kpiBaseFuel').textContent = '₩ ' + fmt(baseFuelSum);
+      document.getElementById('kpiBaseCarbon').textContent = '₩ ' + fmt(baseCarbonSum);
+      document.getElementById('kpiBaseTotal').textContent = '₩ ' + fmt(baseFuelSum + baseCarbonSum);
 
       // Alternatives (vs baseline SUM)
       const fuels = collectFuels();
-      const rows = fuels.map(f=>{
+      const rows = fuels.map(f => {
         const r = calcCost(f.vol, f.mode, f.priceOrAnnual, f.samples, f.ef, f.cprice, f.slip, f.gwp);
-        if(isFinite(r.hint)) f.tr.querySelector('.priceOrAnnual').value = Math.round(r.hint);
+        if (isFinite(r.hint)) f.tr.querySelector('.priceOrAnnual').value = Math.round(r.hint);
         const total = r.fuelCost + r.carbon;
         const fuelPremium = r.fuelCost - baseFuelSum;
         const carbonSaving = baseCarbonSum - r.carbon; // +면 절감
         const net = fuelPremium - carbonSaving; // (+) 비용증가, (−) 순절감
-        return {name:f.name, fuelCost:r.fuelCost, carbon:r.carbon, total, fuelPremium, carbonSaving, net};
+        return { name: f.name, fuelCost: r.fuelCost, carbon: r.carbon, total, fuelPremium, carbonSaving, net };
       });
 
       // Render table (alternatives only — 기준 합계 대비)
       resultBody.innerHTML = '';
-      rows.forEach(r=>{
+      rows.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td>${r.name}</td>
           <td class="right">${fmt(r.fuelCost)}</td>
           <td class="right">${fmt(r.carbon)}</td>
           <td class="right"><strong>${fmt(r.total)}</strong></td>
           <td class="right">${fmt(r.fuelPremium)}</td>
-          <td class="right" style="color:${r.carbonSaving>=0?'#77ffa1':'#ffb3b3'}">${fmt(r.carbonSaving)}</td>
-          <td class="right" style="color:${r.net<=0?'#77ffa1':'#ff8a8a'}"><strong>${fmt(r.net)}</strong></td>`;
+          <td class="right" style="color:${r.carbonSaving >= 0 ? '#77ffa1' : '#ffb3b3'}">${fmt(r.carbonSaving)}</td>
+          <td class="right" style="color:${r.net <= 0 ? '#77ffa1' : '#ff8a8a'}"><strong>${fmt(r.net)}</strong></td>`;
         resultBody.appendChild(tr);
       });
 
       // Charts — Baseline rows + Baseline SUM + Alternatives
-      updateCharts(baseRowsCalcs, {fuel:baseFuelSum, carbon:baseCarbonSum}, rows);
+      updateCharts(baseRowsCalcs, { fuel: baseFuelSum, carbon: baseCarbonSum }, rows);
     }
 
-    function updateCharts(baseRows, baseSum, altRows){
-      const labels = baseRows.map(b=>`기준(${b.name})`).concat(['기준(합계)']).concat(altRows.map(r=>r.name));
-      const fuels  = baseRows.map(b=>b.fuelCost).concat([baseSum.fuel]).concat(altRows.map(r=>r.fuelCost));
-      const carbons= baseRows.map(b=>b.carbon).concat([baseSum.carbon]).concat(altRows.map(r=>r.carbon));
+    function updateCharts(baseRows, baseSum, altRows) {
+      const labels = baseRows.map(b => `기준(${b.name})`).concat(['기준(합계)']).concat(altRows.map(r => r.name));
+      const fuels = baseRows.map(b => b.fuelCost).concat([baseSum.fuel]).concat(altRows.map(r => r.fuelCost));
+      const carbons = baseRows.map(b => b.carbon).concat([baseSum.carbon]).concat(altRows.map(r => r.carbon));
 
       // Delta vs baseline SUM
-      const deltaLabels = baseRows.map(b=>`기준(${b.name})`).concat(altRows.map(r=>r.name));
-      const fuelPremium = baseRows.map(b=> b.fuelCost - baseSum.fuel).concat(altRows.map(r=> r.fuelPremium));
-      const carbonSaving= baseRows.map(b=> baseSum.carbon - b.carbon).concat(altRows.map(r=> r.carbonSaving));
-      const net         = fuelPremium.map((_,i)=> fuelPremium[i] - carbonSaving[i]);
+      const deltaLabels = baseRows.map(b => `기준(${b.name})`).concat(altRows.map(r => r.name));
+      const fuelPremium = baseRows.map(b => b.fuelCost - baseSum.fuel).concat(altRows.map(r => r.fuelPremium));
+      const carbonSaving = baseRows.map(b => baseSum.carbon - b.carbon).concat(altRows.map(r => r.carbonSaving));
+      const net = fuelPremium.map((_, i) => fuelPremium[i] - carbonSaving[i]);
 
       const ctxS = document.getElementById('barStack').getContext('2d');
       const ctxD = document.getElementById('barDelta').getContext('2d');
 
-      if(barStack) barStack.destroy();
+      if (barStack) barStack.destroy();
       barStack = new Chart(ctxS, {
-        type:'bar',
-        data:{ labels, datasets:[
-          {label:'연료비', data: fuels, stack:'S'},
-          {label:'탄소비용', data: carbons, stack:'S'}
-        ]},
-        options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}} }
+        type: 'bar',
+        data: {
+          labels, datasets: [
+            { label: '연료비', data: fuels, stack: 'S' },
+            { label: '탄소비용', data: carbons, stack: 'S' }
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
       });
 
-      if(barDelta) barDelta.destroy();
+      if (barDelta) barDelta.destroy();
       barDelta = new Chart(ctxD, {
-        type:'bar',
-        data:{ labels: deltaLabels, datasets:[
-          {label:'연료 프리미엄', data: fuelPremium},
-          {label:'탄소 절감(+)', data: carbonSaving},
-          {label:'순효과', type:'line', data: net, yAxisID:'y'}
-        ] },
-        options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{ y:{ beginAtZero:false } } }
+        type: 'bar',
+        data: {
+          labels: deltaLabels, datasets: [
+            { label: '연료 프리미엄', data: fuelPremium },
+            { label: '탄소 절감(+)', data: carbonSaving },
+            { label: '순효과', type: 'line', data: net, yAxisID: 'y' }
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: false } } }
       });
     }
 
     // ----- Export / Import (dynamic baselines) -----
-    function exportData(){
-      const baselines = collectBaselines().map(b=>({ name:b.name, vol:b.vol, mode:b.mode, priceOrAnnual:b.priceOrAnnual, ef:b.ef, cprice:b.cprice, slip:b.slip, gwp:b.gwp, samples:b.samples }));
-      const fuels = collectFuels().map(f=>({ name:f.name, vol:f.vol, mode:f.mode, priceOrAnnual:f.priceOrAnnual, ef:f.ef, cprice:f.cprice, slip:f.slip, gwp:f.gwp, samples:f.samples }));
+    function exportData() {
+      const baselines = collectBaselines().map(b => ({ name: b.name, vol: b.vol, mode: b.mode, priceOrAnnual: b.priceOrAnnual, ef: b.ef, cprice: b.cprice, slip: b.slip, gwp: b.gwp, samples: b.samples }));
+      const fuels = collectFuels().map(f => ({ name: f.name, vol: f.vol, mode: f.mode, priceOrAnnual: f.priceOrAnnual, ef: f.ef, cprice: f.cprice, slip: f.slip, gwp: f.gwp, samples: f.samples }));
       return { baselines, fuels };
     }
 
-    function importData(data){
+    function importData(data) {
       // baselines
-      baselineBody.innerHTML='';
-      if(Array.isArray(data.baselines) && data.baselines.length){
-        data.baselines.forEach(b=>{
-          addBaseline(b.name||'VLSFO');
+      baselineBody.innerHTML = '';
+      if (Array.isArray(data.baselines) && data.baselines.length) {
+        data.baselines.forEach(b => {
+          addBaseline(b.name || 'VLSFO');
           const tr = baselineBody.lastElementChild;
-          tr.querySelector('.b-fname').value = b.name||'VLSFO';
-          tr.querySelector('.b-vol').value = b.vol ?? PRESETS[(normalizeKey(b.name||'VLSFO'))]?.defaultVol ?? 10000;
+          tr.querySelector('.b-fname').value = b.name || 'VLSFO';
+          tr.querySelector('.b-vol').value = b.vol ?? PRESETS[(normalizeKey(b.name || 'VLSFO'))]?.defaultVol ?? 10000;
           tr.querySelector('.b-mode').value = b.mode || 'unit';
-          tr.querySelector('.b-priceOrAnnual').value = b.priceOrAnnual ?? PRESETS[(normalizeKey(b.name||'VLSFO'))]?.defaultPrice ?? 1200000;
-          tr.querySelector('.b-ef').value = b.ef ?? PRESETS[(normalizeKey(b.name||'VLSFO'))]?.ef ?? 3.114;
+          tr.querySelector('.b-priceOrAnnual').value = b.priceOrAnnual ?? PRESETS[(normalizeKey(b.name || 'VLSFO'))]?.defaultPrice ?? 1200000;
+          tr.querySelector('.b-ef').value = b.ef ?? PRESETS[(normalizeKey(b.name || 'VLSFO'))]?.ef ?? 3.114;
           tr.querySelector('.b-cprice').value = b.cprice ?? 0;
-          tr.querySelector('.b-slip').value = b.slip ?? PRESETS[(normalizeKey(b.name||'VLSFO'))]?.slip ?? 0;
+          tr.querySelector('.b-slip').value = b.slip ?? PRESETS[(normalizeKey(b.name || 'VLSFO'))]?.slip ?? 0;
           tr.querySelector('.b-gwp').value = b.gwp ?? 27.2;
           // samples
           toggleSamples(tr.querySelector('button.btn.ghost'));
-          const sBody = tr.nextElementSibling.querySelector('tbody'); sBody.innerHTML='';
-          (b.samples||[]).forEach(v=>{ const r=document.createElement('tr'); r.innerHTML = `<td class='right'></td><td><input type='number' value='${v}' step='1000' min='0'/></td><td><button class='btn' type='button' onclick='this.closest("tr").remove(); recalc();'>삭제</button></td>`; sBody.appendChild(r); });
-          [...sBody.querySelectorAll('tr')].forEach((row,i)=> row.children[0].textContent = i+1);
-          sBody.querySelectorAll('input').forEach(inp=> inp.addEventListener('input', recalc));
+          const sBody = tr.nextElementSibling.querySelector('tbody'); sBody.innerHTML = '';
+          (b.samples || []).forEach(v => { const r = document.createElement('tr'); r.innerHTML = `<td class='right'></td><td><input type='number' value='${v}' step='1000' min='0'/></td><td><button class='btn' type='button' onclick='this.closest("tr").remove(); recalc();'>삭제</button></td>`; sBody.appendChild(r); });
+          [...sBody.querySelectorAll('tr')].forEach((row, i) => row.children[0].textContent = i + 1);
+          sBody.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
         });
-      } else if (data.baseline){ // legacy single
-        addBaseline(data.baseline.name||'VLSFO');
+      } else if (data.baseline) { // legacy single
+        addBaseline(data.baseline.name || 'VLSFO');
       } else {
         addBaseline('VLSFO');
         addBaseline('MGO');
       }
 
       // fuels
-      fuelBody.innerHTML='';
-      (data.fuels||[]).forEach(f=>{
-        addFuel(f.name||'Custom');
+      fuelBody.innerHTML = '';
+      (data.fuels || []).forEach(f => {
+        addFuel(f.name || 'Custom');
         const last = fuelBody.lastElementChild;
-        last.querySelector('.fname').value = f.name||'Custom';
-        last.children[1].querySelector('input').value = f.vol||0;
-        last.children[2].querySelector('select').value = f.mode||'unit';
-        last.children[3].querySelector('.priceOrAnnual').value = f.priceOrAnnual||0;
-        last.children[4].querySelector('input').value = f.ef||0;
-        last.children[5].querySelector('input').value = f.cprice||0;
-        last.children[6].querySelector('input').value = f.slip||0;
-        last.children[7].querySelector('input').value = f.gwp||27.2;
+        last.querySelector('.fname').value = f.name || 'Custom';
+        last.children[1].querySelector('input').value = f.vol || 0;
+        last.children[2].querySelector('select').value = f.mode || 'unit';
+        last.children[3].querySelector('.priceOrAnnual').value = f.priceOrAnnual || 0;
+        last.children[4].querySelector('input').value = f.ef || 0;
+        last.children[5].querySelector('input').value = f.cprice || 0;
+        last.children[6].querySelector('input').value = f.slip || 0;
+        last.children[7].querySelector('input').value = f.gwp || 27.2;
         toggleSamples(last.querySelector('button.btn.ghost'));
-        const tb = last.nextElementSibling.querySelector('tbody'); tb.innerHTML='';
-        (f.samples||[]).forEach(v=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td class='right'></td><td><input type='number' value='${v}' step='1000' min='0'/></td><td><button class='btn' type='button' onclick='this.closest("tr").remove(); recalc();'>삭제</button></td>`; tb.appendChild(tr); });
-        [...tb.querySelectorAll('tr')].forEach((row,i)=> row.children[0].textContent = i+1);
-        tb.querySelectorAll('input').forEach(inp=> inp.addEventListener('input', recalc));
+        const tb = last.nextElementSibling.querySelector('tbody'); tb.innerHTML = '';
+        (f.samples || []).forEach(v => { const tr = document.createElement('tr'); tr.innerHTML = `<td class='right'></td><td><input type='number' value='${v}' step='1000' min='0'/></td><td><button class='btn' type='button' onclick='this.closest("tr").remove(); recalc();'>삭제</button></td>`; tb.appendChild(tr); });
+        [...tb.querySelectorAll('tr')].forEach((row, i) => row.children[0].textContent = i + 1);
+        tb.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
       });
 
       recalc(); refreshAllVolVisibility();
     }
 
     // ----- Tests -----
-    function runTests(){
+    function runTests() {
       const out = document.getElementById('testOut');
       const logs = [];
-      function log(s){ logs.push(s); }
+      function log(s) { logs.push(s); }
 
       // (1) unit+avg vs annual+sum (기존)
       {
-        const r1 = calcCost(10, 'unit', 100, [100,200,300], 3, 0, 0, 0);
-        const r2 = calcCost(10, 'annual', 100, [100,200,300], 3, 0, 0, 0);
-        console.assert(Math.round(r1.fuelCost)===2000, 'unit+avg fuelCost');
-        console.assert(Math.round(r2.fuelCost)===600, 'annual+sum fuelCost');
+        const r1 = calcCost(10, 'unit', 100, [100, 200, 300], 3, 0, 0, 0);
+        const r2 = calcCost(10, 'annual', 100, [100, 200, 300], 3, 0, 0, 0);
+        console.assert(Math.round(r1.fuelCost) === 2000, 'unit+avg fuelCost');
+        console.assert(Math.round(r2.fuelCost) === 600, 'annual+sum fuelCost');
         log('✅ unit/annual 샘플 처리 OK');
       }
       // (2) baseline SUM reference (기존)
       {
-        const b1 = calcCost(1000,'unit',1000,[],3.114,0,0,27.2);
-        const b2 = calcCost(1000,'unit',1200,[],3.206,0,0,27.2);
+        const b1 = calcCost(1000, 'unit', 1000, [], 3.114, 0, 0, 27.2);
+        const b2 = calcCost(1000, 'unit', 1200, [], 3.206, 0, 0, 27.2);
         const sumFuel = b1.fuelCost + b2.fuelCost; // 2,200,000
-        const a = calcCost(1000,'unit',1300,[],2.75,0,0.2,27.2);
+        const a = calcCost(1000, 'unit', 1300, [], 2.75, 0, 0.2, 27.2);
         const fuelPremium = a.fuelCost - sumFuel; // -900,000
         console.assert(fuelPremium === (a.fuelCost - sumFuel), 'baseline 합계 기준 프리미엄');
         log('✅ 기준 합계 대비 프리미엄 계산 OK');
       }
       // (3) 슬립/탄소단가 영향 (기존)
       {
-        const noSlip = calcCost(100,'unit',1000,[],2.75,100,0,27.2);
-        const withSlip = calcCost(100,'unit',1000,[],2.75,100,0.5,27.2);
+        const noSlip = calcCost(100, 'unit', 1000, [], 2.75, 100, 0, 27.2);
+        const withSlip = calcCost(100, 'unit', 1000, [], 2.75, 100, 0.5, 27.2);
         console.assert(withSlip.carbon > noSlip.carbon, '메탄 슬립 증가 시 탄소비용 증가');
         log('✅ 슬립 반영 OK (carbon up)');
       }
       // (4) hint 평균 검증 (기존)
       {
-        const r = calcCost(10,'unit',100,[100,200,300,400],3,0,0,27.2);
-        console.assert(Math.round(r.hint)===250, 'hint==avg(samples)');
+        const r = calcCost(10, 'unit', 100, [100, 200, 300, 400], 3, 0, 0, 27.2);
+        console.assert(Math.round(r.hint) === 250, 'hint==avg(samples)');
         log('✅ hint 평균 노출 OK');
       }
       // (5) annual 모드 no-samples (기존)
       {
-        const r = calcCost(10,'annual',123456,[],3,0,0,27.2);
-        console.assert(r.fuelCost===123456, 'annual without samples uses priceOrAnnual');
+        const r = calcCost(10, 'annual', 123456, [], 3, 0, 0, 27.2);
+        console.assert(r.fuelCost === 123456, 'annual without samples uses priceOrAnnual');
         log('✅ annual no-samples 처리 OK');
       }
       // (6) removeBaselineRow 존재 (기존)
@@ -1030,7 +1333,7 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
         const slipB = +trB.querySelector('.b-slip').value;
         const gwpB = +trB.querySelector('.b-gwp').value;
         const cpriceB = +trB.querySelector('.b-cprice').value;
-        console.assert(nameB==='' && volB===0 && priceB===0 && efB===0 && slipB===0 && gwpB===27.2 && cpriceB===0, 'Baseline Custom defaults');
+        console.assert(nameB === '' && volB === 0 && priceB === 0 && efB === 0 && slipB === 0 && gwpB === 27.2 && cpriceB === 0, 'Baseline Custom defaults');
         log('✅ Baseline 사용자 지정 기본값 OK');
 
         addFuel('Custom');
@@ -1042,53 +1345,53 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
         const cpriceF = +trF.children[5].querySelector('input').value;
         const slipF = +trF.children[6].querySelector('input').value;
         const gwpF = +trF.children[7].querySelector('input').value;
-        console.assert(nameF==='' && volF===0 && priceF===0 && efF===0 && cpriceF===0 && slipF===0 && gwpF===27.2, 'Fuel Custom defaults');
+        console.assert(nameF === '' && volF === 0 && priceF === 0 && efF === 0 && cpriceF === 0 && slipF === 0 && gwpF === 27.2, 'Fuel Custom defaults');
         log('✅ Fuel 사용자 지정 기본값 OK');
       }
       // (8) GWP 영향: 슬립 0이면 영향 없음 (기존)
       {
-        const rA = calcCost(100,'unit',1000,[],2.75,200,0,27.2);
-        const rB = calcCost(100,'unit',1000,[],2.75,200,0,50);
-        console.assert(rA.carbon===rB.carbon, 'Slip 0 -> GWP 영향 없음');
+        const rA = calcCost(100, 'unit', 1000, [], 2.75, 200, 0, 27.2);
+        const rB = calcCost(100, 'unit', 1000, [], 2.75, 200, 0, 50);
+        console.assert(rA.carbon === rB.carbon, 'Slip 0 -> GWP 영향 없음');
         log('✅ Slip 0에서 GWP 무영향 확인');
       }
       // (9) GWP 증가 시 carbon 증가 (기존)
       {
-        const rA = calcCost(100,'unit',1000,[],2.75,200,0.2,27.2);
-        const rB = calcCost(100,'unit',1000,[],2.75,200,0.2,50);
-        console.assert(rB.carbon>rA.carbon, 'GWP up -> carbon up');
+        const rA = calcCost(100, 'unit', 1000, [], 2.75, 200, 0.2, 27.2);
+        const rB = calcCost(100, 'unit', 1000, [], 2.75, 200, 0.2, 50);
+        console.assert(rB.carbon > rA.carbon, 'GWP up -> carbon up');
         log('✅ GWP 증가 효과 확인');
       }
       // (10) 차트 업데이트 예외 없이 동작 (기존)
       {
-        const baseRows=[{name:'VLSFO',fuelCost:100,carbon:50}];
-        const baseSum={fuel:100,carbon:50};
-        const alts=[{name:'LNG',fuelCost:90,carbon:30,fuelPremium:-10,carbonSaving:20}];
-        try{ updateCharts(baseRows,baseSum,alts); log('✅ 차트 업데이트 OK'); }
-        catch(e){ console.assert(false,'Chart update failed: '+e.message); }
+        const baseRows = [{ name: 'VLSFO', fuelCost: 100, carbon: 50 }];
+        const baseSum = { fuel: 100, carbon: 50 };
+        const alts = [{ name: 'LNG', fuelCost: 90, carbon: 30, fuelPremium: -10, carbonSaving: 20 }];
+        try { updateCharts(baseRows, baseSum, alts); log('✅ 차트 업데이트 OK'); }
+        catch (e) { console.assert(false, 'Chart update failed: ' + e.message); }
       }
       // (11) Hydrogen: EF=0, slip=0 -> carbon==0 (신규)
       {
-        const r = calcCost(100,'unit',1000,[],0,300,0,27.2);
-        console.assert(r.carbon===0, 'Hydrogen TTW carbon should be 0 when slip=0');
+        const r = calcCost(100, 'unit', 1000, [], 0, 300, 0, 27.2);
+        console.assert(r.carbon === 0, 'Hydrogen TTW carbon should be 0 when slip=0');
         log('✅ Hydrogen carbon=0 확인');
       }
       // (12) Methanol EF>0 -> carbon>0 (신규)
       {
-        const r = calcCost(100,'unit',1000,[],1.375,100,0,27.2);
-        console.assert(r.carbon>0, 'Methanol TTW carbon > 0');
+        const r = calcCost(100, 'unit', 1000, [], 1.375, 100, 0, 27.2);
+        console.assert(r.carbon > 0, 'Methanol TTW carbon > 0');
         log('✅ Methanol carbon > 0 확인');
       }
       // (13) Market KRW 계산 테스트 (신규)
       {
         document.getElementById('fxUSDKRW').value = 1400; renderMarket();
         const usd = 500; MARKET[0].usd = usd; renderMarket();
-        const krwCell = marketBody.querySelectorAll('.m-krw')[0].textContent.replace(/[,\s]/g,'');
-        console.assert(+krwCell === usd*1400, '환율×USD → KRW/mt 계산');
+        const krwCell = marketBody.querySelectorAll('.m-krw')[0].textContent.replace(/[,\s]/g, '');
+        console.assert(+krwCell === usd * 1400, '환율×USD → KRW/mt 계산');
         log('✅ Market 환율 환산 OK');
       }
 
-      out.textContent = logs.length? logs.join('\n') : 'No logs';
+      out.textContent = logs.length ? logs.join('\n') : 'No logs';
     }
 
     // expose globals for inline onclick handlers
@@ -1108,11 +1411,12 @@ const msg = `사용량 산출 완료 — 업데이트: ${updated}개, 건너뜀:
     addBaseline('MGO');
     addFuel('LNG');
     addFuel('Bio');
-  renderMarket();
-  renderEnergyTable();
-  recomputeAllEffRows();
+    renderMarket();
+    renderEnergyTable();
+    recomputeAllEffRows();
   </script>
 </body>
+
 </html>
 
 <!--
